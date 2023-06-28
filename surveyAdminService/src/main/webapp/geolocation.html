@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Geolocation Survey</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  </head>
+  <body>
+    <h1>Geolocation Survey</h1>
+    <p id="results">No survey results</p>
+    <script>
+      function appendResults(str) {
+    	  var results = document.getElementById("results");
+    	  if (results.innerHTML == 'No survey results') {
+    		  results.innerHTML = str;
+    	  } else {
+    		  results.innerHTML = str + "<br />" + results.innerHTML;
+    	  }
+      }
+    
+      try {
+    	  if ('WebSocket' in window || 'MozWebSocket' in window) {
+        	  var websocketUrl = "ws://" + window.location.host + "/GeolocationWebSocket";
+        	  console.log("Initiating web socket to " + websocketUrl);
+        	  
+              ws = new WebSocket(websocketUrl);
+              
+              ws.onopen = function () {
+            	  console.log("WebSocket successfully opened");
+              };
+
+              ws.onmessage = function (evt) {
+            	  console.log("WebSocket received message");
+            	  console.log(evt);
+            	  
+            	  appendResults(evt.data);
+              };
+
+              ws.onclose = function () {
+            	  console.log("WebSocket closed");
+              };
+          } else {
+    		  appendResults("ERROR: WebSockets not supported or not enabled in this browser.");
+    	  }
+      } catch (e) {
+    	  console.log(e);
+      }
+    </script>
+  </body>
+</html>

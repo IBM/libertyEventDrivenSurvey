@@ -96,6 +96,18 @@ under the License.
       <artifactId>cloudevents-http-restful-ws-jakarta</artifactId>
       <version>${dependency.version.cloudevents-http-restful-ws-jakarta}</version>
     </dependency>
+    <dependency>
+      <groupId>jakarta.platform</groupId>
+      <artifactId>jakarta.jakartaee-api</artifactId>
+      <version>${dependency.version.jakarta.jakartaee-api}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.websocket</groupId>
+      <artifactId>jakarta.websocket-api</artifactId>
+      <version>${dependency.version.jakarta.websocket-api}</version>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
   <build>
     <finalName>${project.artifactId}</finalName>

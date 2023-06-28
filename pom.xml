@@ -71,6 +71,8 @@ under the License.
       <dependency.version.rxjava>3.1.6</dependency.version.rxjava>
       <dependency.version.jakarta.servlet-api>6.0.0</dependency.version.jakarta.servlet-api>
       <dependency.version.cloudevents-http-restful-ws-jakarta>2.5.0</dependency.version.cloudevents-http-restful-ws-jakarta>
+      <dependency.version.jakarta.websocket-api>2.1.0</dependency.version.jakarta.websocket-api>
+      <dependency.version.jakarta.jakartaee-api>10.0.0</dependency.version.jakarta.jakartaee-api>
   </properties>
 
   <modules>
