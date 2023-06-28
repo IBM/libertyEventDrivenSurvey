@@ -2,9 +2,21 @@
 
 ## Development
 
+1. If using `podman machine`, set your connection to the `root` connection:
+   ```
+   podman system connection default podman-machine-default-root
+   ```
+1. Create Kafka container network if it doesn't exist:
+   ```
+   podman network create kafka
+   ```
+1. Start Kafka:
+   ```
+   podman run --rm -p 9092:9092 -e "ALLOW_PLAINTEXT_LISTENER=yes" -e "KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-0:9092" --name kafka-0 --network kafka docker.io/bitnami/kafka
+   ```
 1. Build:
    ```
-   mvn clean deploy
+   mvn -Dimage.builder.arguments="--platform linux/amd64" -Dimage.checkpoint.arguments="--network kafka --user root" clean deploy
    ```
 
 ## Learn More

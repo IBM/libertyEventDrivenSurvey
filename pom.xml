@@ -7,7 +7,7 @@
   <groupId>com.example</groupId>
   <artifactId>libertyEventDrivenSurvey</artifactId>
   <packaging>pom</packaging>
-  <name>${project.libertyEventDrivenSurvey}</name>
+  <name>${project.artifactId}</name>
 
   <properties>
     <openliberty.maven.version>3.7.1</openliberty.maven.version>
@@ -26,20 +26,34 @@
     <image.description>${project.artifactId}</image.description>
     <image.source>https://github.com/IBM/libertyEventDrivenSurvey</image.source>
     <image.url>${image.source}</image.url>
-    <!-- image.repository is either blank or otherwise must end with a / -->
+    <!-- image.repository is either blank or otherwise must be lower case and end with a / -->
     <image.repository>localhost/</image.repository>
     <image.tag>latest</image.tag>
     <!-- Any other arguments to pass to the image builder -->
     <image.builder.arguments></image.builder.arguments>
+    <dependency.version.maven-war-plugin>3.4.0</dependency.version.maven-war-plugin>
+    <dependency.version.maven-deploy-plugin>3.1.1</dependency.version.maven-deploy-plugin>
+    <dependency.version.maven-antrun-plugin>3.1.0</dependency.version.maven-antrun-plugin>
+    <dependency.version.microprofile>6.0</dependency.version.microprofile>
+    <dependency.version.smallrye-reactive-messaging>4.5.0</dependency.version.smallrye-reactive-messaging>
+    <dependency.version.smallrye-reactive-streams-operators>1.0.13</dependency.version.smallrye-reactive-streams-operators>
+    <dependency.version.micrometer-core>1.10.6</dependency.version.micrometer-core>
+    <dependency.version.kafka-clients>3.4.0</dependency.version.kafka-clients>
+    <dependency.version.slf4j-api>2.0.7</dependency.version.slf4j-api>
+    <dependency.version.slf4j-jdk14>2.0.7</dependency.version.slf4j-jdk14>
+    <dependency.version.rxjava>3.1.6</dependency.version.rxjava>
+    <dependency.version.jakarta.servlet-api>6.0.0</dependency.version.jakarta.servlet-api>
+    <dependency.version.cloudevents-http-restful-ws-jakarta>2.5.0</dependency.version.cloudevents-http-restful-ws-jakarta>
   </properties>
 
   <modules>
+    <module>surveyAdminService</module>
   </modules>
 
   <build>
     <pluginManagement>
       <plugins>
-	  	  <plugin>
+        <plugin>
           <artifactId>maven-deploy-plugin</artifactId>
           <configuration>
             <!--
