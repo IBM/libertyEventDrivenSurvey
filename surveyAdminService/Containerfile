@@ -56,6 +56,9 @@ COPY --chown=default:root target/liberty/wlp/usr/servers/surveyAdminService/jvm.
 COPY --chown=default:root target/liberty/wlp/usr/servers/surveyAdminService/bootstrap.properties /config/bootstrap.properties
 COPY --chown=default:root target/surveyAdminService.war /config/apps
 
+# Maven generates a variables file that will override the defaults
+COPY --chown=default:root target/liberty/wlp/usr/servers/surveyAdminService/configDropins/overrides/liberty-plugin-variable-config.xml /config/configDropins/overrides/
+
 USER root
 RUN dnf install -y iptables
 USER 1001

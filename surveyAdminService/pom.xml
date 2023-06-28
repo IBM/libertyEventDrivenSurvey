@@ -30,6 +30,7 @@ under the License.
     <!-- Must be lower case -->
     <image.name>surveyadminservice</image.name>
   </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.eclipse.microprofile</groupId>
@@ -237,7 +238,7 @@ under the License.
                     <echo level="info" message="==================" />
                     <echo level="info" message="Created local container image ${image.repository}${image.user}${image.name}:${image.tag}" />
                     <echo level="info" message="To run this image:" />
-                    <echo level="info" message="  ${image.builder} run --privileged --rm -it ${image.repository}${image.user}${image.name}:${image.tag}" />
+                    <echo level="info" message="  ${image.builder} run --privileged --rm -p 9080:9080 -p 9443:9443 -it ${image.repository}${image.user}${image.name}:${image.tag}" />
                   </target>
                 </configuration>
                 <goals>
