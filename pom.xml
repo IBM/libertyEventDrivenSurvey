@@ -78,6 +78,7 @@ under the License.
   <modules>
     <module>surveyAdminService</module>
     <module>surveyInputService</module>
+    <module>surveyGeocoderService</module>
   </modules>
 
   <build>
