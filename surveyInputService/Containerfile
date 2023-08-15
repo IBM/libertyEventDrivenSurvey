@@ -51,13 +51,13 @@ LABEL \
   org.opencontainers.image.licenses="${LICENSE}" \
   license="${LICENSE}"
 
-COPY --chown=default:root target/liberty/wlp/usr/servers/surveyAdminService/server.xml /config/server.xml
-COPY --chown=default:root target/liberty/wlp/usr/servers/surveyAdminService/jvm.options /config/jvm.options
-COPY --chown=default:root target/liberty/wlp/usr/servers/surveyAdminService/bootstrap.properties /config/bootstrap.properties
-COPY --chown=default:root target/surveyAdminService.war /config/apps
+COPY --chown=default:root target/liberty/wlp/usr/servers/surveyInputService/server.xml /config/server.xml
+COPY --chown=default:root target/liberty/wlp/usr/servers/surveyInputService/jvm.options /config/jvm.options
+COPY --chown=default:root target/liberty/wlp/usr/servers/surveyInputService/bootstrap.properties /config/bootstrap.properties
+COPY --chown=default:root target/surveyInputService.war /config/apps
 
 # Maven generates a variables file that will override the defaults
-COPY --chown=default:root target/liberty/wlp/usr/servers/surveyAdminService/configDropins/overrides/liberty-plugin-variable-config.xml /config/configDropins/overrides/
+COPY --chown=default:root target/liberty/wlp/usr/servers/surveyInputService/configDropins/overrides/liberty-plugin-variable-config.xml /config/configDropins/overrides/
 
 USER root
 RUN dnf install -y iptables

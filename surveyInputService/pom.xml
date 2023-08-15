@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright 2023 IBM Corp. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not
+use this file except in compliance with the License. You may obtain a copy
+of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+License for the specific language governing permissions and limitations
+under the License.
+-->
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>surveyInputService</artifactId>
+  <packaging>war</packaging>
+
+	<parent>
+		<version>1.0-SNAPSHOT</version>
+		<groupId>com.example</groupId>
+		<artifactId>libertyEventDrivenSurvey</artifactId>
+	</parent>
+
+  <properties>
+    <!-- Must be lower case -->
+    <image.name>surveyinputservice</image.name>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.eclipse.microprofile</groupId>
+      <artifactId>microprofile</artifactId>
+      <version>${dependency.version.microprofile}</version>
+      <type>pom</type>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.smallrye.reactive</groupId>
+      <artifactId>smallrye-reactive-messaging</artifactId>
+      <version>${dependency.version.smallrye-reactive-messaging}</version>
+      <type>pom</type>
+    </dependency>
+    <dependency>
+      <groupId>io.smallrye.reactive</groupId>
+      <artifactId>smallrye-reactive-messaging-provider</artifactId>
+      <version>${dependency.version.smallrye-reactive-messaging}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.smallrye.reactive</groupId>
+      <artifactId>smallrye-reactive-messaging-kafka</artifactId>
+      <version>${dependency.version.smallrye-reactive-messaging}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.smallrye.reactive</groupId>
+      <artifactId>smallrye-reactive-streams-operators</artifactId>
+      <version>${dependency.version.smallrye-reactive-streams-operators}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.micrometer</groupId>
+      <artifactId>micrometer-core</artifactId>
+      <version>${dependency.version.micrometer-core}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.kafka</groupId>
+      <artifactId>kafka-clients</artifactId>
+      <version>${dependency.version.kafka-clients}</version>
+    </dependency>
+    <dependency> 
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${dependency.version.slf4j-api}</version>
+    </dependency>
+    <dependency> 
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-jdk14</artifactId>
+      <version>${dependency.version.slf4j-jdk14}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.reactivex.rxjava3</groupId>
+      <artifactId>rxjava</artifactId>
+      <version>${dependency.version.rxjava}</version>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+      <version>${dependency.version.jakarta.servlet-api}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.cloudevents</groupId>
+      <artifactId>cloudevents-http-restful-ws-jakarta</artifactId>
+      <version>${dependency.version.cloudevents-http-restful-ws-jakarta}</version>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.platform</groupId>
+      <artifactId>jakarta.jakartaee-api</artifactId>
+      <version>${dependency.version.jakarta.jakartaee-api}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.websocket</groupId>
+      <artifactId>jakarta.websocket-api</artifactId>
+      <version>${dependency.version.jakarta.websocket-api}</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+  <build>
+    <finalName>${project.artifactId}</finalName>
+  </build>
+  <profiles>
+    <profile>
+      <id>liberty</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-war-plugin</artifactId>
+            <version>${dependency.version.maven-war-plugin}</version>
+            <configuration>
+              <failOnMissingWebXml>false</failOnMissingWebXml>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-deploy-plugin</artifactId>
+            <version>${dependency.version.maven-deploy-plugin}</version>
+            <configuration>
+              <!--
+                Disable the default deploy plugin so that we can
+                use the deploy phase to build the container.
+              -->
+              <skip>true</skip>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>io.openliberty.tools</groupId>
+            <artifactId>liberty-maven-plugin</artifactId>
+            <version>${openliberty.maven.version}</version>
+            <executions>
+              <execution>
+                <id>package-server</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>create</goal>
+                  <goal>install-feature</goal>
+                  <goal>deploy</goal>
+                  <goal>package</goal>
+                </goals>
+                <configuration>
+                  <outputDirectory>target/wlp-package</outputDirectory>
+                </configuration>
+              </execution>
+            </executions>
+            <configuration>
+              <assemblyArtifact>
+                <groupId>io.openliberty</groupId>
+                <artifactId>openliberty-runtime</artifactId>
+                <version>${openliberty.version}</version>
+                <type>zip</type>
+              </assemblyArtifact>
+              <include>runnable</include>
+              <serverName>${project.build.finalName}</serverName>
+              <bootstrapProperties>
+                <project.name>${project.build.finalName}</project.name>
+                <jwt.issuer>${image.source}</jwt.issuer>
+              </bootstrapProperties>
+            </configuration>
+          </plugin>
+          <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>${dependency.version.maven-antrun-plugin}</version>
+            <executions>
+              <execution>
+                <phase>deploy</phase>
+                <configuration>
+                  <target xmlns:if="ant:if" xmlns:unless="ant:unless">
+                    <echo level="info" message="Building ${image.repository}${image.user}${image.name}:${image.tag}" />
+                    <exec dir="${project.basedir}" executable="${image.builder}" failonerror="true">
+                      <arg value="build" />
+                      <arg value="--cap-add"/>
+                      <arg value="CHECKPOINT_RESTORE"/>
+                      <arg value="--cap-add" />
+                      <arg value="NET_ADMIN" />
+                      <arg value="--cap-add" />
+                      <arg value="SYS_PTRACE" />
+                      <arg value="--cap-add" />
+                      <arg value="SETPCAP" />
+                      <arg value="--security-opt" />
+                      <arg value="seccomp=unconfined" />
+                      <arg value="--build-arg" />
+                      <arg value="VERSION=${project.version}" />
+                      <arg value="--build-arg" />
+                      <arg value="AUTHORS=${image.authors}" />
+                      <arg value="--build-arg" />
+                      <arg value="VENDOR=${image.vendor}" />
+                      <arg value="--build-arg" />
+                      <arg value="SUMMARY=${image.summary}" />
+                      <arg value="--build-arg" />
+                      <arg value="NAME=${image.name}" />
+                      <arg value="--build-arg" />
+                      <arg value="DESCRIPTION=${image.description}" />
+                      <arg value="--build-arg" />
+                      <arg value="URL=${image.url}" />
+                      <arg value="--build-arg" />
+                      <arg value="SOURCE=${image.source}" />
+                      <arg value="--file" />
+                      <arg value="Containerfile" />
+                      <arg line="${image.builder.arguments}" />
+                      <arg value="-t" />
+                      <arg value="${image.repository}${image.user}${image.name}:${image.tag}-temp" />
+                      <arg value="." />
+                    </exec>
+
+                    <!-- Remove any previously failed image builds -->
+                    <exec dir="${project.basedir}" executable="${image.builder}" failonerror="true">
+                      <arg value="rm" />
+                      <arg value="-i" />
+                      <arg value="instanton-temp" />
+                    </exec>
+
+                    <!-- Run the image to generate the CheckPoint container -->
+                    <exec dir="${project.basedir}" executable="${image.builder}" failonerror="true">
+                      <arg value="run" />
+                      <arg value="--platform" />
+                      <arg value="linux/amd64" />
+                      <arg value="--name" />
+                      <arg value="instanton-temp" />
+                      <arg value="--privileged" />
+                      <arg value="--env" />
+                      <arg value="WLP_CHECKPOINT=${checkpoint.type}" />
+                      <arg line="${image.checkpoint.arguments}" />
+                      <arg value="${image.repository}${image.user}${image.name}:${image.tag}-temp" />
+                    </exec>
+
+                    <!-- Commit the above image -->
+                    <exec dir="${project.basedir}" executable="${image.builder}" failonerror="true">
+                      <arg value="commit" />
+                      <arg value="instanton-temp" />
+                      <arg value="${image.repository}${image.user}${image.name}:${image.tag}" />
+                    </exec>
+
+                    <echo level="info" message="==================" />
+                    <echo level="info" message="Created local container image ${image.repository}${image.user}${image.name}:${image.tag}" />
+                    <echo level="info" message="To run this image:" />
+                    <echo level="info" message="  ${image.builder} run --privileged --rm -p 9080:9080 -p 9443:9443 -it ${image.repository}${image.user}${image.name}:${image.tag}" />
+                  </target>
+                </configuration>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>

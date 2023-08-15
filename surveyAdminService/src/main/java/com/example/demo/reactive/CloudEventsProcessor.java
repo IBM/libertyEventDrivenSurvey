@@ -30,7 +30,7 @@ public class CloudEventsProcessor {
 	@Path("geocodeComplete")
 	@POST
     @Produces(MediaType.APPLICATION_JSON)
-	public Response cloudEvent1(CloudEvent incoming) {
+	public Response geocodeComplete(CloudEvent incoming) {
 		System.out.println("Received CloudEvent " + incoming);
 		return Response.ok().build();
 	}

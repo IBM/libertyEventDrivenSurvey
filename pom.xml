@@ -32,7 +32,7 @@ under the License.
 
     <!-- Liberty options -->
       <openliberty.maven.version>3.7.1</openliberty.maven.version>
-      <openliberty.version>23.0.0.3</openliberty.version>
+      <openliberty.version>23.0.0.6</openliberty.version>
       <checkpoint.type>applications</checkpoint.type>
 
     <!-- Liberty configuration
@@ -77,6 +77,7 @@ under the License.
 
   <modules>
     <module>surveyAdminService</module>
+    <module>surveyInputService</module>
   </modules>
 
   <build>
