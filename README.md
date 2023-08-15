@@ -28,6 +28,15 @@
    ```
    mvn clean deploy
    ```
+1. Run the `surveyInputService`:
+   ```
+   podman run --privileged --rm --network kafka  --rm -p 9080:9080 -p 9443:9443 -it localhost/surveyinputservice:latest
+   ```
+1. Wait for the message:
+   ```
+   [...] CWWKZ0001I: Application surveyInputService started [...]
+   ```
+1. Access <http://localhost:9080/location.html> or <https://localhost:9443/location.html>
 
 ## Learn More
 

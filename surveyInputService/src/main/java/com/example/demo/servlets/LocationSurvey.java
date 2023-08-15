@@ -4,6 +4,11 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.eclipse.microprofile.reactive.messaging.Channel;
+import org.eclipse.microprofile.reactive.messaging.Emitter;
+import org.eclipse.microprofile.reactive.messaging.Message;
+
+import jakarta.inject.Inject;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -17,6 +22,10 @@ public class LocationSurvey extends HttpServlet {
 	private static final String CLASS_NAME = LocationSurvey.class.getCanonicalName();
 	private static final Logger LOG = Logger.getLogger(CLASS_NAME);
 
+	@Inject
+	@Channel("locationInputs")
+	Emitter<String> emitter;
+
 	protected void service(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
@@ -29,9 +38,10 @@ public class LocationSurvey extends HttpServlet {
 			LOG.info("textInput1: " + textInput1);
 
 		if (textInput1 != null && textInput1.length() > 0) {
-			
+
 			// Input is good! Publish to Kafka
-			
+			emitter.send(Message.of(textInput1));
+
 			writeResponse(response, """
 					        <h1>Thank you!</h1>
 					        <p>Your submission has been received. You may close this window.</p>
