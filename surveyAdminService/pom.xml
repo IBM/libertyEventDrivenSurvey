@@ -188,13 +188,13 @@ under the License.
                       <arg value="--cap-add"/>
                       <arg value="CHECKPOINT_RESTORE"/>
                       <arg value="--cap-add" />
-                      <arg value="NET_ADMIN" />
-                      <arg value="--cap-add" />
                       <arg value="SYS_PTRACE" />
                       <arg value="--cap-add" />
                       <arg value="SETPCAP" />
                       <arg value="--security-opt" />
                       <arg value="seccomp=unconfined" />
+                      <arg value="--build-arg" />
+                      <arg value="CHECKPOINT_TYPE=${checkpoint.type}" />
                       <arg value="--build-arg" />
                       <arg value="VERSION=${project.version}" />
                       <arg value="--build-arg" />
@@ -215,42 +215,14 @@ under the License.
                       <arg value="Containerfile" />
                       <arg line="${image.builder.arguments}" />
                       <arg value="-t" />
-                      <arg value="${image.repository}${image.user}${image.name}:${image.tag}-temp" />
-                      <arg value="." />
-                    </exec>
-
-                    <!-- Remove any previously failed image builds -->
-                    <exec dir="${project.basedir}" executable="${image.builder}" failonerror="true">
-                      <arg value="rm" />
-                      <arg value="-i" />
-                      <arg value="instanton-temp" />
-                    </exec>
-
-                    <!-- Run the image to generate the CheckPoint container -->
-                    <exec dir="${project.basedir}" executable="${image.builder}" failonerror="true">
-                      <arg value="run" />
-                      <arg value="--platform" />
-                      <arg value="linux/amd64" />
-                      <arg value="--name" />
-                      <arg value="instanton-temp" />
-                      <arg value="--privileged" />
-                      <arg value="--env" />
-                      <arg value="WLP_CHECKPOINT=${checkpoint.type}" />
-                      <arg line="${image.checkpoint.arguments}" />
-                      <arg value="${image.repository}${image.user}${image.name}:${image.tag}-temp" />
-                    </exec>
-
-                    <!-- Commit the above image -->
-                    <exec dir="${project.basedir}" executable="${image.builder}" failonerror="true">
-                      <arg value="commit" />
-                      <arg value="instanton-temp" />
                       <arg value="${image.repository}${image.user}${image.name}:${image.tag}" />
+                      <arg value="." />
                     </exec>
 
                     <echo level="info" message="==================" />
                     <echo level="info" message="Created local container image ${image.repository}${image.user}${image.name}:${image.tag}" />
                     <echo level="info" message="To run this image:" />
-                    <echo level="info" message="  ${image.builder} run --privileged --rm -p 9080:9080 -p 9443:9443 -it ${image.repository}${image.user}${image.name}:${image.tag}" />
+                    <echo level="info" message="  ${image.builder} run --privileged --rm --network kafka --rm -p 9080:9080 -p 9443:9443 -it ${image.repository}${image.user}${image.name}:${image.tag}" />
                   </target>
                 </configuration>
                 <goals>

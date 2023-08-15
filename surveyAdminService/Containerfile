@@ -12,7 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-FROM icr.io/appcafe/open-liberty
+FROM icr.io/appcafe/websphere-liberty:full-java17-openj9-ubi
 
 # These defaults are overridden by `--build-arg` arguments in pom.xml
 ARG NAME=placeholder
@@ -30,6 +30,7 @@ ARG VERBOSE=false
 ARG OPENJ9_SCC=true
 ARG OPENJ9_JAVA_OPTIONS=""
 ARG CONSOLE_FORMAT="simple"
+ARG CHECKPOINT_TYPE="beforeAppStart"
 
 # https://github.com/opencontainers/image-spec/blob/main/annotations.md#pre-defined-annotation-keys
 LABEL \
@@ -52,6 +53,9 @@ LABEL \
   license="${LICENSE}"
 
 COPY --chown=default:root target/liberty/wlp/usr/servers/surveyAdminService/server.xml /config/server.xml
+
+RUN features.sh
+
 COPY --chown=default:root target/liberty/wlp/usr/servers/surveyAdminService/jvm.options /config/jvm.options
 COPY --chown=default:root target/liberty/wlp/usr/servers/surveyAdminService/bootstrap.properties /config/bootstrap.properties
 COPY --chown=default:root target/surveyAdminService.war /config/apps
@@ -59,11 +63,9 @@ COPY --chown=default:root target/surveyAdminService.war /config/apps
 # Maven generates a variables file that will override the defaults
 COPY --chown=default:root target/liberty/wlp/usr/servers/surveyAdminService/configDropins/overrides/liberty-plugin-variable-config.xml /config/configDropins/overrides/
 
-USER root
-RUN dnf install -y iptables
-USER 1001
-
 ENV WLP_LOGGING_CONSOLE_FORMAT=${CONSOLE_FORMAT}
 
 # This script will add the requested XML snippets, grow image to be fit-for-purpose and apply interim fixes
 RUN configure.sh
+
+RUN checkpoint.sh ${CHECKPOINT_TYPE}
