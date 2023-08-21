@@ -21,6 +21,6 @@ under the License.
         <feature>websocket-2.1</feature>
     </featureManager>
 
-    <httpEndpoint id="defaultHttpEndpoint" host="*" httpPort="9080" httpsPort="9443" />
+    <httpEndpoint id="defaultHttpEndpoint" host="*" httpPort="8080" httpsPort="8443" />
     <webApplication location="${project.name}.war" contextRoot="/"/>
 </server>
