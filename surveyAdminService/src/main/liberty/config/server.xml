@@ -16,7 +16,7 @@ under the License.
 -->
 <server>
     <featureManager>
-        <feature>jakartaee-10.0</feature>
+        <feature>webProfile-10.0</feature>
         <feature>microProfile-6.0</feature>
         <feature>websocket-2.1</feature>
     </featureManager>
