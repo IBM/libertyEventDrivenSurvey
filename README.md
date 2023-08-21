@@ -18,6 +18,13 @@
        podman machine ssh "setsebool virt_sandbox_use_netlink 1"
        ```
        Note that this must be done after every time the podman machine restarts.
+1. Build:
+   ```
+   mvn clean deploy
+   ```
+
+### Testing Locally
+
 1. Create Kafka container network if it doesn't exist:
    ```
    podman network create kafka
@@ -25,10 +32,6 @@
 1. Start Kafka:
    ```
    podman run --rm -p 9092:9092 -e "ALLOW_PLAINTEXT_LISTENER=yes" -e "KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-0:9092" -e "KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093" -e "KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT" -e "KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka-0:9093" -e "KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER" -e "KAFKA_CFG_PROCESS_ROLES=controller,broker" -e "KAFKA_CFG_NODE_ID=0" --name kafka-0 --network kafka docker.io/bitnami/kafka
-   ```
-1. Build:
-   ```
-   mvn clean deploy
    ```
 1. Run `surveyInputService`:
    ```
