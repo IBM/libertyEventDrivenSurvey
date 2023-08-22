@@ -161,9 +161,14 @@
 
 1. Submit a location input:
     1. Using the command line:
-       ```
-       curl -k --data "textInput1=New York, NY" "$(kn service list surveyinputservice -o jsonpath="{.items[0].status.url}{'\n'}")/LocationSurvey"
-       ```
+        1. Execute:
+           ```
+           curl -k --data "textInput1=New York, NY" "$(kn service list surveyinputservice -o jsonpath="{.items[0].status.url}{'\n'}")/LocationSurvey"
+           ```
+        1. Check for a successful output:
+           ```
+           Your submission has been received
+           ```
     1. Using the browser:
         1. Find and open the URL:
            ```
