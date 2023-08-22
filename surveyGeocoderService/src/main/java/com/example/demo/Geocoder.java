@@ -54,10 +54,18 @@ public class Geocoder {
 		AutocompletePrediction[] predictions = PlacesApi.placeAutocomplete(context, location, session)
 				.types(PlaceAutocompleteType.CITIES).types(PlaceAutocompleteType.REGIONS).await();
 
+		/*-
+		 * TODO:
+		 * Caused by: java.lang.reflect.InaccessibleObjectException: Unable to make field private final byte java.time.LocalTime.hour accessible: module java.base does not "opens java.time" to unnamed module @73fd66b
+		 * [...]
+		 * 	at com.google.gson.internal.reflect.ReflectionHelper.makeAccessible(ReflectionHelper.java:35)
+
 		if (LOG.isLoggable(Level.INFO)) {
 			Gson gson = new GsonBuilder().setPrettyPrinting().create();
 			LOG.info("Predictions: " + gson.toJson(predictions));
 		}
+		
+		 */
 
 		if (predictions == null || predictions.length == 0) {
 			throw new RuntimeException("No predictions found");
@@ -66,11 +74,6 @@ public class Geocoder {
 		// https://developers.google.com/maps/documentation/places/web-service/details
 		PlaceDetails result = PlacesApi.placeDetails(context, predictions[0].placeId, session)
 				.fields(FieldMask.GEOMETRY_LOCATION).await();
-
-		if (LOG.isLoggable(Level.INFO)) {
-			Gson gson = new GsonBuilder().setPrettyPrinting().create();
-			LOG.info("First place details: " + gson.toJson(result));
-		}
 
 		if (LOG.isLoggable(Level.FINER))
 			LOG.exiting(CLASS_NAME, "geocode", result);
