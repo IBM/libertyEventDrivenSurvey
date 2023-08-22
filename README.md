@@ -25,6 +25,155 @@
    mvn clean deploy
    ```
 
+### Deploy to OpenShift
+
+1. Ensure the [internal registry is available](https://publib.boulder.ibm.com/httpserv/cookbook/Troubleshooting_Recipes-Troubleshooting_OpenShift_Recipes-OpenShift_Use_Image_Registry_Recipe.html)
+1. Push `surveyInputService` to the registry:
+   ```
+   REGISTRY=$(oc get route default-route -n openshift-image-registry --template='{{ .spec.host }}')
+   echo "Registry host: ${REGISTRY}"
+   printf "Does it look good (yes=ENTER, no=Ctrl^C)? "
+   read trash
+   podman login --tls-verify=false -u $(oc whoami) -p $(oc whoami -t) ${REGISTRY}
+   podman tag localhost/surveyinputservice $REGISTRY/libertysurvey/surveyinputservice
+   podman push --tls-verify=false $REGISTRY/libertysurvey/surveyinputservice
+   ```
+1. Check the current project is the right one:
+   ```
+   oc project
+   ```
+1. Create KNative Service for `surveyInputService` replacing the `kafka.bootstrap.servers` envar value with the AMQ Streams Kafka Cluster bootstrap address:
+   ```
+   apiVersion: serving.knative.dev/v1
+   kind: Service
+   metadata:
+     name: surveyinputservice
+   spec:
+     template:
+       spec:
+         containers:
+         - name: surveyinputservice
+           image: image-registry.openshift-image-registry.svc:5000/libertysurvey/surveyinputservice
+           imagePullPolicy: Always
+           env:
+           - name: kafka.bootstrap.servers
+             value: my-cluster-kafka-bootstrap.amq-streams-kafka.svc:9092
+         timeoutSeconds: 300
+   ```
+   Apply:
+   ```
+   oc apply -f doc/example_surveyinputservice.yaml
+   ```
+1. Query until `READY` is `True`:
+   ```
+   kn service list surveyinputservice
+   ```
+1. Access the URL to drive pod creation:
+   ```
+   curl -k "$(kn service list surveyinputservice -o jsonpath="{.items[0].status.url}{'\n'}")"
+   ```
+1. Double check logs look good:
+   ```
+   oc exec -it $(oc get pod -o name | grep surveyinputservice) -c surveyinputservice -- cat /logs/messages.log
+   ```
+1. Push `surveyGeocoderService` to the registry:
+   ```
+   REGISTRY=$(oc get route default-route -n openshift-image-registry --template='{{ .spec.host }}')
+   echo "Registry host: ${REGISTRY}"
+   printf "Does it look good (yes=ENTER, no=Ctrl^C)? "
+   read trash
+   podman login --tls-verify=false -u $(oc whoami) -p $(oc whoami -t) ${REGISTRY}
+   podman tag localhost/surveygeocoderservice $REGISTRY/libertysurvey/surveygeocoderservice
+   podman push --tls-verify=false $REGISTRY/libertysurvey/surveygeocoderservice
+   ```
+1. Create KNative Service for `surveyGeocoderService` replacing the `kafka.bootstrap.servers` envar value with the AMQ Streams Kafka Cluster bootstrap address:
+   ```
+   apiVersion: serving.knative.dev/v1
+   kind: Service
+   metadata:
+     name: surveygeocoderservice
+   spec:
+     template:
+       spec:
+         containers:
+         - name: surveygeocoderservice
+           image: image-registry.openshift-image-registry.svc:5000/libertysurvey/surveygeocoderservice
+           imagePullPolicy: Always
+           env:
+           - name: kafka.bootstrap.servers
+             value: my-cluster-kafka-bootstrap.amq-streams-kafka.svc:9092
+         timeoutSeconds: 300
+   ```
+   Apply:
+   ```
+   oc apply -f doc/example_surveygeocoderservice.yaml
+   ```
+1. Query until `READY` is `True`:
+   ```
+   kn service list surveygeocoderservice
+   ```
+1. Access the URL to drive pod creation:
+   ```
+   curl -k "$(kn service list surveygeocoderservice -o jsonpath="{.items[0].status.url}{'\n'}")"
+   ```
+1. Double check logs look good:
+   ```
+   oc exec -it $(oc get pod -o name | grep surveygeocoderservice) -c surveygeocoderservice -- cat /logs/messages.log
+   ```
+1. Create KNative Eventing KafkaSource for `surveyGeocoderService` replacing `bootstrapServers` with the AMQ Streams Kafka Cluster bootstrap address:
+   ```
+   apiVersion: sources.knative.dev/v1beta1
+   kind: KafkaSource
+   metadata:
+     name: locationtopicsource
+   spec:
+     bootstrapServers:
+     - my-cluster-kafka-bootstrap.amq-streams-kafka.svc:9092
+     sink:
+       ref:
+         apiVersion: serving.knative.dev/v1
+         kind: Service
+         name: surveygeocoderservice
+       uri: "/api/cloudevents/locationInput"
+     topics:
+     - locationtopic
+   ```
+   Apply:
+   ```
+   oc apply -f doc/example_surveygeocoderkafkasource.yaml
+   ```
+1. Query until `OK` is `++`:
+   ```
+   kn source kafka describe locationtopicsource
+   ```
+1. Print and open the URL of `surveyInputService`:
+   ```
+   kn service list surveyinputservice -o jsonpath="{.items[0].status.url}{'\n'}"
+   ```
+1. Double check logs look good:
+   ```
+   oc exec -it $(oc get pod -o name | grep surveygeocoderservice) -c surveygeocoderservice -- cat /logs/messages.log
+   ```
+
+#### Clean-up tasks
+
+##### Delete surveyInputService
+
+```
+kn service delete surveyinputservice
+```
+
+##### Delete surveyGeocoderService
+
+1. Delete the KafkaSource:
+   ```
+   kn source kafka delete locationtopicsource
+   ```
+1. Delete the KNative Service:
+   ```
+   kn service delete surveygeocoderservice
+   ```
+
 ### Testing Locally
 
 1. Create Kafka container network if it doesn't exist:

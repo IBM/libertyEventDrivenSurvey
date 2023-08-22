@@ -1,0 +1,15 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: surveygeocoderservice
+spec:
+  template:
+    spec:
+      containers:
+      - name: surveygeocoderservice
+        image: image-registry.openshift-image-registry.svc:5000/libertysurvey/surveygeocoderservice
+        imagePullPolicy: Always
+        env:
+        - name: kafka.bootstrap.servers
+          value: my-cluster-kafka-bootstrap.amq-streams-kafka.svc:9092
+      timeoutSeconds: 300
