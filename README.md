@@ -94,7 +94,7 @@
    podman tag localhost/surveygeocoderservice $REGISTRY/libertysurvey/surveygeocoderservice
    podman push --tls-verify=false $REGISTRY/libertysurvey/surveygeocoderservice
    ```
-1. Create a KNative Service for `surveyGeocoderService` replacing `INSERT_API_KEY` with your Google Maps API key and `kafka.bootstrap.servers` envar value with the AMQ Streams Kafka Cluster bootstrap address:
+1. Create a KNative Service for `surveyGeocoderService` replacing `INSERT_API_KEY` with your Google Maps API key and the `kafka.bootstrap.servers` envar value with the AMQ Streams Kafka Cluster bootstrap address:
    ```
    apiVersion: serving.knative.dev/v1
    kind: Service
@@ -174,7 +174,7 @@
            ```
            kn service list surveyinputservice -o jsonpath="{.items[0].status.url}{'\n'}"
            ```
-    1. Click `Location Survey` and submit the form
+        1. Click `Location Survey` and submit the form
 1. Double check logs look good:
    ```
    oc exec -it $(oc get pod -o name | grep surveygeocoderservice) -c surveygeocoderservice -- tail -f /logs/messages.log
