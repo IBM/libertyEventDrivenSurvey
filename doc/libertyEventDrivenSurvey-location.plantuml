@@ -22,6 +22,6 @@ user1 --> knativeServing1 : HTTP
 knativeServing1 --^ surveyInputService : HTTP
 surveyInputService --# locationtopic : Kafka Emitter
 locationtopic #-> knativeServing2 : KafkaSource
-knativeServing2 --> surveyGeocoderService : HTTP
+knativeServing2 --> surveyGeocoderService : HTTP (CloudEvent)
 
 @enduml

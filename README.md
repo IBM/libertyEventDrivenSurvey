@@ -27,7 +27,12 @@
 
 ### Deploy to OpenShift
 
+#### Pre-requisities
+
 1. Ensure the [internal registry is available](https://publib.boulder.ibm.com/httpserv/cookbook/Troubleshooting_Recipes-Troubleshooting_OpenShift_Recipes-OpenShift_Use_Image_Registry_Recipe.html)
+
+#### Deploy surveyInputService
+
 1. Push `surveyInputService` to the registry:
    ```
    REGISTRY=$(oc get route default-route -n openshift-image-registry --template='{{ .spec.host }}')
@@ -76,6 +81,9 @@
    ```
    oc exec -it $(oc get pod -o name | grep surveyinputservice) -c surveyinputservice -- cat /logs/messages.log
    ```
+
+#### Deploy surveyGeocoderService
+
 1. Push `surveyGeocoderService` to the registry:
    ```
    REGISTRY=$(oc get route default-route -n openshift-image-registry --template='{{ .spec.host }}')
@@ -146,6 +154,9 @@
    ```
    kn source kafka describe locationtopicsource
    ```
+
+#### Test
+
 1. Print and open the URL of `surveyInputService`:
    ```
    kn service list surveyinputservice -o jsonpath="{.items[0].status.url}{'\n'}"
