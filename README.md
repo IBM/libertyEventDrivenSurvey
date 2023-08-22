@@ -35,13 +35,13 @@
    ```
 1. Run `surveyInputService`:
    ```
-   podman run --privileged --rm --network kafka  --rm -p 9080:9080 -p 9443:9443 -it localhost/surveyinputservice:latest
+   podman run --privileged --rm --network kafka  --rm -p 8080:8080 -p 8443:8443 -it localhost/surveyinputservice:latest
    ```
 1. Wait for the message:
    ```
    [...] CWWKZ0001I: Application surveyInputService started [...]
    ```
-1. Access <http://localhost:9080/location.html> or <https://localhost:9443/location.html>
+1. Access <http://localhost:8080/location.html> or <https://localhost:8443/location.html>
 
 ### Additional Development Notes
 
@@ -49,11 +49,11 @@
 
 1. Run `surveyGeocoderService`:
    ```
-   podman run --privileged --rm --network kafka --rm -p 9080:9080 -p 9443:9443 -it localhost/surveygeocoderservice:latest
+   podman run --privileged --rm --rm -p 8080:8080 -p 8443:8443 -it localhost/surveygeocoderservice:latest
    ```
-1. To post a [`CloudEvent`](https://github.com/cloudevents/spec/blob/v1.0/spec.md#required-attributes) to `reactive-service-b`:
+1. To post a [`CloudEvent`](https://github.com/cloudevents/spec/blob/v1.0/spec.md#required-attributes):
    ```
-   curl -X POST http://localhost:9080/api/cloudevents/locationInput \
+   curl -X POST http://localhost:8080/api/cloudevents/locationInput \
      -H "Ce-Source: https://example.com/" \
      -H "Ce-Id: $(uuidgen)" \
      -H "Ce-Specversion: 1.0" \
