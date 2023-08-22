@@ -8,9 +8,13 @@ scale 1.0
 
 actor user1 as " "
 
+' https://plantuml.com/deployment-diagram
 cloud kubernetes as "Kubernetes" {
+  collections knativeServing1 as "KNative Serving"
+  collections surveyInputService
 }
 
-user1 --> kubernetes
+user1 --> knativeServing1
+knativeServing1 --> surveyInputService
 
 @enduml
