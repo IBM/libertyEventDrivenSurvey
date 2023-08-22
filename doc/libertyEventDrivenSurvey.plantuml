@@ -1,0 +1,16 @@
+@startuml
+
+title libertyEventDrivenSurvey
+
+skinparam monochrome true
+skinparam DefaultTextAlignment center
+scale 1.0
+
+actor user1 as " "
+
+cloud kubernetes as "Kubernetes" {
+}
+
+user1 --> kubernetes
+
+@enduml
