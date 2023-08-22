@@ -157,9 +157,9 @@
 
 #### Test
 
-1. Print and open the URL of `surveyInputService`:
+1. Submit a location input:
    ```
-   kn service list surveyinputservice -o jsonpath="{.items[0].status.url}{'\n'}"
+   curl -k --data "textInput1=New York, NY" "$(kn service list surveyinputservice -o jsonpath="{.items[0].status.url}{'\n'}")/LocationSurvey"
    ```
 1. Double check logs look good:
    ```
