@@ -74,6 +74,7 @@ under the License.
       <dependency.version.cloudevents-cloudevents-kafka>2.3.0</dependency.version.cloudevents-cloudevents-kafka>
       <dependency.version.jakarta.websocket-api>2.1.0</dependency.version.jakarta.websocket-api>
       <dependency.version.jakarta.jakartaee-api>10.0.0</dependency.version.jakarta.jakartaee-api>
+      <dependency.version.google-maps-services>2.2.0</dependency.version.google-maps-services>
   </properties>
 
   <modules>

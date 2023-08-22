@@ -47,7 +47,7 @@
    ```
    oc project
    ```
-1. Create KNative Service for `surveyInputService` replacing the `kafka.bootstrap.servers` envar value with the AMQ Streams Kafka Cluster bootstrap address:
+1. Create a KNative Service for `surveyInputService` replacing the `kafka.bootstrap.servers` envar value with the AMQ Streams Kafka Cluster bootstrap address:
    ```
    apiVersion: serving.knative.dev/v1
    kind: Service
@@ -94,7 +94,7 @@
    podman tag localhost/surveygeocoderservice $REGISTRY/libertysurvey/surveygeocoderservice
    podman push --tls-verify=false $REGISTRY/libertysurvey/surveygeocoderservice
    ```
-1. Create KNative Service for `surveyGeocoderService` replacing the `kafka.bootstrap.servers` envar value with the AMQ Streams Kafka Cluster bootstrap address:
+1. Create a KNative Service for `surveyGeocoderService` replacing `INSERT_API_KEY` with your Google Maps API key and `kafka.bootstrap.servers` envar value with the AMQ Streams Kafka Cluster bootstrap address:
    ```
    apiVersion: serving.knative.dev/v1
    kind: Service
@@ -110,6 +110,8 @@
            env:
            - name: kafka.bootstrap.servers
              value: my-cluster-kafka-bootstrap.amq-streams-kafka.svc:9092
+           - name: GOOGLE_API_KEY
+             value: INSERT_API_KEY
          timeoutSeconds: 300
    ```
    Apply:
@@ -128,7 +130,7 @@
    ```
    oc exec -it $(oc get pod -o name | grep surveygeocoderservice) -c surveygeocoderservice -- cat /logs/messages.log
    ```
-1. Create KNative Eventing KafkaSource for `surveyGeocoderService` replacing `bootstrapServers` with the AMQ Streams Kafka Cluster bootstrap address:
+1. Create a KNative Eventing KafkaSource for `surveyGeocoderService` replacing `bootstrapServers` with the AMQ Streams Kafka Cluster bootstrap address:
    ```
    apiVersion: sources.knative.dev/v1beta1
    kind: KafkaSource
@@ -158,12 +160,19 @@
 #### Test
 
 1. Submit a location input:
-   ```
-   curl -k --data "textInput1=New York, NY" "$(kn service list surveyinputservice -o jsonpath="{.items[0].status.url}{'\n'}")/LocationSurvey"
-   ```
+    1. Using the command line:
+       ```
+       curl -k --data "textInput1=New York, NY" "$(kn service list surveyinputservice -o jsonpath="{.items[0].status.url}{'\n'}")/LocationSurvey"
+       ```
+    1. Using the browser:
+        1. Find and open the URL:
+           ```
+           kn service list surveyinputservice -o jsonpath="{.items[0].status.url}{'\n'}"
+           ```
+    1. Click `Location Survey` and submit the form
 1. Double check logs look good:
    ```
-   oc exec -it $(oc get pod -o name | grep surveygeocoderservice) -c surveygeocoderservice -- cat /logs/messages.log
+   oc exec -it $(oc get pod -o name | grep surveygeocoderservice) -c surveygeocoderservice -- tail -f /logs/messages.log
    ```
 
 #### Clean-up tasks

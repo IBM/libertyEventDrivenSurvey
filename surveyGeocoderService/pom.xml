@@ -70,6 +70,11 @@ under the License.
       <artifactId>kafka-clients</artifactId>
       <version>${dependency.version.kafka-clients}</version>
     </dependency>
+    <dependency>
+      <groupId>com.google.maps</groupId>
+      <artifactId>google-maps-services</artifactId>
+      <version>${dependency.version.google-maps-services}</version>
+    </dependency>
     <dependency> 
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
