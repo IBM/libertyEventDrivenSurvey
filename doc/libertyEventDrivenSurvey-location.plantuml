@@ -6,15 +6,22 @@ skinparam monochrome true
 skinparam DefaultTextAlignment center
 scale 1.0
 
-actor user1 as " "
+actor user1 as "User"
 
 ' https://plantuml.com/deployment-diagram
+' Arrows: https://plantuml.com/deployment-diagram#bb3fdb917676e9ae
 cloud kubernetes as "Kubernetes" {
   collections knativeServing1 as "KNative Serving"
   collections surveyInputService
+  stack locationtopic
+  collections knativeServing2 as "KNative Eventing"
+  collections surveyGeocoderService
 }
 
-user1 --> knativeServing1
-knativeServing1 --> surveyInputService
+user1 --> knativeServing1 : HTTP
+knativeServing1 --> surveyInputService : HTTP
+surveyInputService --+ locationtopic : Kafka Emitter
+locationtopic 0-> knativeServing2 : KafkaSource
+knativeServing2 --> surveyGeocoderService : HTTP
 
 @enduml
