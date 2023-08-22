@@ -23,7 +23,7 @@ public class LocationSurvey extends HttpServlet {
 	private static final Logger LOG = Logger.getLogger(CLASS_NAME);
 
 	@Inject
-	@Channel("locationInputs")
+	@Channel("locationtopic")
 	Emitter<String> emitter;
 
 	protected void service(HttpServletRequest request, HttpServletResponse response)
@@ -43,8 +43,8 @@ public class LocationSurvey extends HttpServlet {
 			emitter.send(Message.of(textInput1));
 
 			writeResponse(response, """
-					        <h1>Thank you!</h1>
-					        <p>Your submission has been received. You may close this window.</p>
+					      <h1>Thank you!</h1>
+					      <p>Your submission has been received. You may close this window.</p>
 					""");
 		} else {
 			writeResponse(response, """
