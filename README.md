@@ -51,7 +51,7 @@
    podman tag localhost/surveyadminservice $REGISTRY/libertysurvey/surveyadminservice
    podman push --tls-verify=false $REGISTRY/libertysurvey/surveyadminservice
    ```
-1. Create a KNative Service for `surveyAdminService` replacing the `kafka.bootstrap.servers` envar value with the AMQ Streams Kafka Cluster bootstrap address:
+1. Create a KNative Service for `surveyAdminService` replacing `INSERT_API_KEY` with your Google Maps API key and the `kafka.bootstrap.servers` envar value with the AMQ Streams Kafka Cluster bootstrap address:
    ```
    apiVersion: serving.knative.dev/v1
    kind: Service
@@ -71,6 +71,8 @@
            env:
            - name: kafka.bootstrap.servers
              value: my-cluster-kafka-bootstrap.amq-streams-kafka.svc:9092
+           - name: GOOGLE_API_KEY
+             value: INSERT_API_KEY
    ```
    Apply:
    ```
