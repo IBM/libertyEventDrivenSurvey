@@ -114,6 +114,10 @@
    ```
    kn source kafka describe geocodetopicsource
    ```
+1. Tail the main pod logs:
+   ```
+   oc exec -it $(oc get pod -o name | grep surveyadminservice) -c surveyadminservice -- tail -f /logs/messages.log
+   ```
 
 #### Deploy surveyGeocoderService
 
@@ -190,6 +194,10 @@
 1. Query until `OK` is `++`:
    ```
    kn source kafka describe locationtopicsource
+   ```
+1. Tail the main pod logs:
+   ```
+   oc exec -it $(oc get pod -o name | grep surveygeocoderservice) -c surveygeocoderservice -- tail -f /logs/messages.log
    ```
 
 #### Deploy surveyInputService
