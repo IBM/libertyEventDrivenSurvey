@@ -33,6 +33,6 @@ googleMaps --> surveyGeocoderService
 surveyGeocoderService ---# geocodetopic : Kafka Emitter
 geocodetopic #-> knativeServing3 : KafkaSource
 knativeServing3 --> surveyAdminService : HTTP (CloudEvent)
-surveyAdminService --> admin
+surveyAdminService --> admin : HTTP (WebSocket)
 
 @enduml
