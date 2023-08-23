@@ -88,6 +88,32 @@
    ```
 1. Open your browser to the URL in the previous output.
 1. Click `Start New Geolocation Survey`
+1. Create a KNative Eventing KafkaSource for `surveyAdminService` replacing `bootstrapServers` with the AMQ Streams Kafka Cluster bootstrap address:
+   ```
+   apiVersion: sources.knative.dev/v1beta1
+   kind: KafkaSource
+   metadata:
+     name: geocodetopicsource
+   spec:
+     bootstrapServers:
+     - my-cluster-kafka-bootstrap.amq-streams-kafka.svc:9092
+     sink:
+       ref:
+         apiVersion: serving.knative.dev/v1
+         kind: Service
+         name: surveyadminservice
+       uri: "/api/cloudevents/geocodeComplete"
+     topics:
+     - geocodetopic
+   ```
+   Apply:
+   ```
+   oc apply -f doc/example_surveyadminkafkasource.yaml
+   ```
+1. Query until `OK` is `++`:
+   ```
+   kn source kafka describe geocodetopicsource
+   ```
 
 #### Deploy surveyGeocoderService
 
@@ -247,7 +273,7 @@
 ##### Delete surveyAdminService
 
 ```
-kn service delete surveyAdminService
+kn service delete surveyadminservice
 ```
 
 ##### Delete surveyInputService
