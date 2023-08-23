@@ -39,6 +39,54 @@
     1. Install the [`KNativeKafka` broker](https://docs.openshift.com/serverless/1.29/install/installing-knative-eventing.html#serverless-install-kafka-odc_installing-knative-eventing)
 1. Ensure the [internal OpenShift registry is available](https://publib.boulder.ibm.com/httpserv/cookbook/Troubleshooting_Recipes-Troubleshooting_OpenShift_Recipes-OpenShift_Use_Image_Registry_Recipe.html)
 
+#### Deploy surveyAdminService
+
+1. Push `surveyAdminService` to the registry:
+   ```
+   REGISTRY=$(oc get route default-route -n openshift-image-registry --template='{{ .spec.host }}')
+   echo "Registry host: ${REGISTRY}"
+   printf "Does it look good (yes=ENTER, no=Ctrl^C)? "
+   read trash
+   podman login --tls-verify=false -u $(oc whoami) -p $(oc whoami -t) ${REGISTRY}
+   podman tag localhost/surveyadminservice $REGISTRY/libertysurvey/surveyadminservice
+   podman push --tls-verify=false $REGISTRY/libertysurvey/surveyadminservice
+   ```
+1. Create a KNative Service for `surveyAdminService` replacing the `kafka.bootstrap.servers` envar value with the AMQ Streams Kafka Cluster bootstrap address:
+   ```
+   apiVersion: serving.knative.dev/v1
+   kind: Service
+   metadata:
+     name: surveyadminservice
+   spec:
+     template:
+       metadata:
+         annotations:
+           autoscaling.knative.dev/min-scale: "1"
+           autoscaling.knative.dev/max-scale: "1"
+       spec:
+         containers:
+         - name: surveyadminservice
+           image: image-registry.openshift-image-registry.svc:5000/libertysurvey/surveyadminservice
+           imagePullPolicy: Always
+           env:
+           - name: kafka.bootstrap.servers
+             value: my-cluster-kafka-bootstrap.amq-streams-kafka.svc:9092
+   ```
+   Apply:
+   ```
+   oc apply -f doc/example_surveyadminservice.yaml
+   ```
+1. Query until `READY` is `True`:
+   ```
+   kn service list surveyadminservice
+   ```
+1. Get the URL of the service:
+   ```
+   kn service list surveyadminservice -o jsonpath="{.items[0].status.url}{'\n'}"
+   ```
+1. Open your browser to this URL.
+1. Click on `Location Survey`
+
 #### Deploy surveyInputService
 
 1. Push `surveyInputService` to the registry:
@@ -169,48 +217,6 @@
    kn source kafka describe locationtopicsource
    ```
 
-#### Deploy surveyAdminService
-
-1. Push `surveyAdminService` to the registry:
-   ```
-   REGISTRY=$(oc get route default-route -n openshift-image-registry --template='{{ .spec.host }}')
-   echo "Registry host: ${REGISTRY}"
-   printf "Does it look good (yes=ENTER, no=Ctrl^C)? "
-   read trash
-   podman login --tls-verify=false -u $(oc whoami) -p $(oc whoami -t) ${REGISTRY}
-   podman tag localhost/surveyadminservice $REGISTRY/libertysurvey/surveyadminservice
-   podman push --tls-verify=false $REGISTRY/libertysurvey/surveyadminservice
-   ```
-1. Create a KNative Service for `surveyAdminService` replacing the `kafka.bootstrap.servers` envar value with the AMQ Streams Kafka Cluster bootstrap address:
-   ```
-   apiVersion: serving.knative.dev/v1
-   kind: Service
-   metadata:
-     name: surveyadminservice
-   spec:
-     template:
-       metadata:
-         annotations:
-           autoscaling.knative.dev/min-scale: "1"
-           autoscaling.knative.dev/max-scale: "1"
-       spec:
-         containers:
-         - name: surveyadminservice
-           image: image-registry.openshift-image-registry.svc:5000/libertysurvey/surveyadminservice
-           imagePullPolicy: Always
-           env:
-           - name: kafka.bootstrap.servers
-             value: my-cluster-kafka-bootstrap.amq-streams-kafka.svc:9092
-   ```
-   Apply:
-   ```
-   oc apply -f doc/example_surveyadminservice.yaml
-   ```
-1. Query until `READY` is `True`:
-   ```
-   kn service list surveyadminservice
-   ```
-
 #### Test
 
 1. Submit a location input:
@@ -235,6 +241,12 @@
    ```
 
 #### Clean-up tasks
+
+##### Delete surveyAdminService
+
+```
+kn service delete surveyAdminService
+```
 
 ##### Delete surveyInputService
 
