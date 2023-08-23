@@ -6,7 +6,8 @@ skinparam monochrome true
 skinparam DefaultTextAlignment center
 scale 1.0
 
-actor user1 as "User"
+actor user as "User"
+actor admin as "Administrator"
 
 ' https://plantuml.com/deployment-diagram
 ' Arrows: https://plantuml.com/deployment-diagram#bb3fdb917676e9ae
@@ -17,14 +18,19 @@ cloud kubernetes as "Kubernetes" {
   collections knativeServing2 as "KNative Eventing"
   collections surveyGeocoderService
   rectangle googleMaps as "Google Maps API"
+  stack geocodetopic
+  collections surveyAdminService
 }
 
-user1 --> knativeServing1 : HTTP
+user --> knativeServing1 : HTTP
 knativeServing1 --^ surveyInputService : HTTP
 surveyInputService --# locationtopic : Kafka Emitter
 locationtopic #-> knativeServing2 : KafkaSource
 knativeServing2 --> surveyGeocoderService : HTTP (CloudEvent)
 surveyGeocoderService --> googleMaps
 googleMaps --> surveyGeocoderService
+surveyGeocoderService ---# geocodetopic : Kafka Emitter
+geocodetopic #-> surveyAdminService : KafkaSource
+surveyAdminService --> admin
 
 @enduml

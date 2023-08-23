@@ -29,7 +29,15 @@
 
 #### Pre-requisities
 
-1. Ensure the [internal registry is available](https://publib.boulder.ibm.com/httpserv/cookbook/Troubleshooting_Recipes-Troubleshooting_OpenShift_Recipes-OpenShift_Use_Image_Registry_Recipe.html)
+1. Install Kafka; for example, the [Red Hat AMQ Streams operator](https://access.redhat.com/documentation/en-us/red_hat_amq_streams/2.4/html/getting_started_with_amq_streams_on_openshift/proc-deploying-cluster-operator-hub-str)
+    1. Then, create a cluster, e.g. `my-cluster`
+    1. Create topics: `locationtopic`, `geocodetopic`
+1. Install KNative; for example, the [Red Hat OpenShift Serverless operator](https://docs.openshift.com/serverless/1.29/install/install-serverless-operator.html)
+    1. Install the [`kn` command line utility](https://docs.openshift.com/serverless/1.29/install/installing-kn.html)
+    1. Install [KNative Serving](https://docs.openshift.com/serverless/1.29/install/installing-knative-serving.html)
+    1. Install [KNative Eventing](https://docs.openshift.com/serverless/1.29/install/installing-knative-eventing.html)
+    1. Install the [`KNativeKafka` broker](https://docs.openshift.com/serverless/1.29/install/installing-knative-eventing.html#serverless-install-kafka-odc_installing-knative-eventing)
+1. Ensure the [internal OpenShift registry is available](https://publib.boulder.ibm.com/httpserv/cookbook/Troubleshooting_Recipes-Troubleshooting_OpenShift_Recipes-OpenShift_Use_Image_Registry_Recipe.html)
 
 #### Deploy surveyInputService
 
