@@ -63,6 +63,9 @@
      name: surveyinputservice
    spec:
      template:
+       metadata:
+         annotations:
+           autoscaling.knative.dev/scale-down-delay: "15m"
        spec:
          containers:
          - name: surveyinputservice
@@ -71,7 +74,6 @@
            env:
            - name: kafka.bootstrap.servers
              value: my-cluster-kafka-bootstrap.amq-streams-kafka.svc:9092
-         timeoutSeconds: 300
    ```
    Apply:
    ```
@@ -110,6 +112,9 @@
      name: surveygeocoderservice
    spec:
      template:
+       metadata:
+         annotations:
+           autoscaling.knative.dev/scale-down-delay: "15m"
        spec:
          containers:
          - name: surveygeocoderservice
@@ -120,7 +125,6 @@
              value: my-cluster-kafka-bootstrap.amq-streams-kafka.svc:9092
            - name: GOOGLE_API_KEY
              value: INSERT_API_KEY
-         timeoutSeconds: 300
    ```
    Apply:
    ```
@@ -163,6 +167,48 @@
 1. Query until `OK` is `++`:
    ```
    kn source kafka describe locationtopicsource
+   ```
+
+#### Deploy surveyAdminService
+
+1. Push `surveyAdminService` to the registry:
+   ```
+   REGISTRY=$(oc get route default-route -n openshift-image-registry --template='{{ .spec.host }}')
+   echo "Registry host: ${REGISTRY}"
+   printf "Does it look good (yes=ENTER, no=Ctrl^C)? "
+   read trash
+   podman login --tls-verify=false -u $(oc whoami) -p $(oc whoami -t) ${REGISTRY}
+   podman tag localhost/surveyadminservice $REGISTRY/libertysurvey/surveyadminservice
+   podman push --tls-verify=false $REGISTRY/libertysurvey/surveyadminservice
+   ```
+1. Create a KNative Service for `surveyAdminService` replacing the `kafka.bootstrap.servers` envar value with the AMQ Streams Kafka Cluster bootstrap address:
+   ```
+   apiVersion: serving.knative.dev/v1
+   kind: Service
+   metadata:
+     name: surveyadminservice
+   spec:
+     template:
+       metadata:
+         annotations:
+           autoscaling.knative.dev/min-scale: "1"
+           autoscaling.knative.dev/max-scale: "1"
+       spec:
+         containers:
+         - name: surveyadminservice
+           image: image-registry.openshift-image-registry.svc:5000/libertysurvey/surveyadminservice
+           imagePullPolicy: Always
+           env:
+           - name: kafka.bootstrap.servers
+             value: my-cluster-kafka-bootstrap.amq-streams-kafka.svc:9092
+   ```
+   Apply:
+   ```
+   oc apply -f doc/example_surveyadminservice.yaml
+   ```
+1. Query until `READY` is `True`:
+   ```
+   kn service list surveyadminservice
    ```
 
 #### Test
@@ -209,11 +255,34 @@ kn service delete surveyinputservice
 
 ### Testing Locally
 
+Only some functions can be tested locally without KNative.
+
+#### Testing surveyAdminService
+
+1. Run `surveyAdminService`:
+   ```
+   podman run --privileged --rm -p 8080:8080 -p 8443:8443 -it localhost/surveyadminservice:latest
+   ```
+1. Open browser to <http://localhost:8080/geolocation.html>
+1. Post a [`CloudEvent`](https://github.com/cloudevents/spec/blob/v1.0/spec.md#required-attributes):
+   ```
+   curl -X POST http://localhost:8080/api/cloudevents/geocodeComplete \
+     -H "Ce-Source: https://example.com/" \
+     -H "Ce-Id: $(uuidgen)" \
+     -H "Ce-Specversion: 1.0" \
+     -H "Ce-Type: CloudEvent1" \
+     -H "Content-Type: text/plain" \
+     -d "40.7127753 -74.0059728"
+   ```
+1. Switch back to the browser and you should see the point.
+
+#### Testing surveyInputService
+
 1. Create Kafka container network if it doesn't exist:
    ```
    podman network create kafka
    ```
-1. Start Kafka:
+1. Start Kafka if it's not started:
    ```
    podman run --rm -p 9092:9092 -e "ALLOW_PLAINTEXT_LISTENER=yes" -e "KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-0:9092" -e "KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093" -e "KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT" -e "KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka-0:9093" -e "KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER" -e "KAFKA_CFG_PROCESS_ROLES=controller,broker" -e "KAFKA_CFG_NODE_ID=0" --name kafka-0 --network kafka docker.io/bitnami/kafka
    ```
@@ -227,23 +296,29 @@ kn service delete surveyinputservice
    ```
 1. Access <http://localhost:8080/location.html> or <https://localhost:8443/location.html>
 
-### Additional Development Notes
+#### Testing surveyGeocoderService
 
-#### Simple tests of the Geocoder Service
-
+1. Create Kafka container network if it doesn't exist:
+   ```
+   podman network create kafka
+   ```
+1. Start Kafka if it's not started:
+   ```
+   podman run --rm -p 9092:9092 -e "ALLOW_PLAINTEXT_LISTENER=yes" -e "KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-0:9092" -e "KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093" -e "KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT" -e "KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka-0:9093" -e "KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER" -e "KAFKA_CFG_PROCESS_ROLES=controller,broker" -e "KAFKA_CFG_NODE_ID=0" --name kafka-0 --network kafka docker.io/bitnami/kafka
+   ```
 1. Run `surveyGeocoderService`:
    ```
-   podman run --privileged --rm --rm -p 8080:8080 -p 8443:8443 -it localhost/surveygeocoderservice:latest
+   podman run --privileged --rm -p 8080:8080 -p 8443:8443 -e "GOOGLE_API_KEY=..." -it localhost/surveygeocoderservice:latest
    ```
-1. To post a [`CloudEvent`](https://github.com/cloudevents/spec/blob/v1.0/spec.md#required-attributes):
+1. Post a [`CloudEvent`](https://github.com/cloudevents/spec/blob/v1.0/spec.md#required-attributes):
    ```
    curl -X POST http://localhost:8080/api/cloudevents/locationInput \
      -H "Ce-Source: https://example.com/" \
      -H "Ce-Id: $(uuidgen)" \
      -H "Ce-Specversion: 1.0" \
      -H "Ce-Type: CloudEvent1" \
-     -H "Content-Type: application/json" \
-     -d "\"Hello World\""
+     -H "Content-Type: text/plain" \
+     -d "New York, NY"
    ```
 
 ## Learn More

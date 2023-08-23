@@ -4,6 +4,9 @@ metadata:
   name: surveygeocoderservice
 spec:
   template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/scale-down-delay: "15m"
     spec:
       containers:
       - name: surveygeocoderservice
@@ -14,4 +17,3 @@ spec:
           value: my-cluster-kafka-bootstrap.amq-streams-kafka.svc:9092
         - name: GOOGLE_API_KEY
           value: INSERT_API_KEY
-      timeoutSeconds: 300

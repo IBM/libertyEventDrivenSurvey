@@ -13,14 +13,14 @@ actor admin as "Administrator"
 ' Arrows: https://plantuml.com/deployment-diagram#bb3fdb917676e9ae
 cloud kubernetes as "Kubernetes" {
   collections knativeServing1 as "KNative Serving"
-  collections surveyInputService
+  collections surveyInputService as "surveyInputService (0..∞)"
   stack locationtopic
   collections knativeServing2 as "KNative Eventing"
-  collections surveyGeocoderService
+  collections surveyGeocoderService as "surveyGeocoderService (0..∞)"
   rectangle googleMaps as "Google Maps API"
   stack geocodetopic
   collections knativeServing3 as "KNative Eventing"
-  collections surveyAdminService
+  collections surveyAdminService as "surveyAdminService (1..1)"
 }
 
 user --> knativeServing1 : HTTP

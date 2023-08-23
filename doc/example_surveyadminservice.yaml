@@ -1,16 +1,17 @@
 apiVersion: serving.knative.dev/v1
 kind: Service
 metadata:
-  name: surveyinputservice
+  name: surveyadminservice
 spec:
   template:
     metadata:
       annotations:
-        autoscaling.knative.dev/scale-down-delay: "15m"
+        autoscaling.knative.dev/min-scale: "1"
+        autoscaling.knative.dev/max-scale: "1"
     spec:
       containers:
-      - name: surveyinputservice
-        image: image-registry.openshift-image-registry.svc:5000/libertysurvey/surveyinputservice
+      - name: surveyadminservice
+        image: image-registry.openshift-image-registry.svc:5000/libertysurvey/surveyadminservice
         imagePullPolicy: Always
         env:
         - name: kafka.bootstrap.servers

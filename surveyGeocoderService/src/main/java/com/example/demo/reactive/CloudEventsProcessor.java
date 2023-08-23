@@ -5,6 +5,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.eclipse.microprofile.reactive.messaging.Channel;
+import org.eclipse.microprofile.reactive.messaging.Emitter;
+import org.eclipse.microprofile.reactive.messaging.Message;
 
 import com.example.demo.Geocoder;
 import com.google.maps.errors.ApiException;
@@ -13,6 +16,7 @@ import com.google.maps.model.PlaceDetails;
 import io.cloudevents.CloudEvent;
 import io.cloudevents.CloudEventData;
 import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -25,6 +29,10 @@ public class CloudEventsProcessor {
 	private static final String CLASS_NAME = CloudEventsProcessor.class.getCanonicalName();
 	private static final Logger LOG = Logger.getLogger(CLASS_NAME);
 	private static final String ERROR_FAILED_GEOCODING = "Error performing geocoding";
+	
+	@Inject
+	@Channel("geocodetopic")
+	Emitter<String> emitter;
 
 	@Path("locationInput")
 	@POST
@@ -61,7 +69,9 @@ public class CloudEventsProcessor {
 			double longitude = geocodeResult.geometry.location.lng;
 
 			if (LOG.isLoggable(Level.INFO))
-				LOG.info("Point: " + latitude + "," + longitude);
+				LOG.info("Geocoded point: " + latitude + "," + longitude);
+			
+			emitter.send(Message.of(latitude + " " + longitude));
 
 			result = Response.ok().build();
 

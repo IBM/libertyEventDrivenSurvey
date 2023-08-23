@@ -97,6 +97,11 @@ under the License.
       <version>${dependency.version.cloudevents-http-restful-ws-jakarta}</version>
     </dependency>
     <dependency>
+      <groupId>io.cloudevents</groupId>
+      <artifactId>cloudevents-kafka</artifactId>
+      <version>${dependency.version.cloudevents-cloudevents-kafka}</version>
+    </dependency>
+    <dependency>
       <groupId>jakarta.platform</groupId>
       <artifactId>jakarta.jakartaee-api</artifactId>
       <version>${dependency.version.jakarta.jakartaee-api}</version>
