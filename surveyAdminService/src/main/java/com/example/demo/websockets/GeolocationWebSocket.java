@@ -45,6 +45,10 @@ public class GeolocationWebSocket {
 	public void onBrowserMessage(Session session, String message) {
 		if (LOG.isLoggable(Level.INFO))
 			LOG.info("GeolocationWebSocket received message from " + session.getId() + ": " + message);
+		
+		if (!"PING".equals(message)) {
+			// Message other than a ping
+		}
 	}
 
 	@OnClose

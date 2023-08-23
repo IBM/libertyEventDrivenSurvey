@@ -67,38 +67,80 @@
     	  }
       }
       
+      function pingWebSocket() {
+    	  if (window.ws && window.wsready) {
+    		  window.ws.send("PING");
+    	  }
+      }
+      
+      function tryReconnectWebSocket() {
+    	  window.reconnecting = true;
+    	  openWebSocket();
+      }
+      
       function openWebSocket() {
     	  try {
         	  if ('WebSocket' in window || 'MozWebSocket' in window) {
-            	  var websocketUrl = window.location.protocol === 'https:' ? "wss://" : "ws://";
-            	  websocketUrl += window.location.host + "/GeolocationWebSocket";
-            	  console.log("Initiating web socket to " + websocketUrl);
-            	  
-                  ws = new WebSocket(websocketUrl);
-                  
-                  ws.onopen = function () {
-                	  console.log("WebSocket successfully opened");
-                  };
-
-                  ws.onmessage = function (evt) {
-                	  console.log("WebSocket received message");
-                	  console.log(evt);
-                	  handleResult(evt.data);
-                  };
-
-                  ws.onerror = function (evt) {
-                	  console.log("WebSocket error");
-                	  console.log(evt);
-                	  handleResult("ERROR: WebSocket received an error");
-                  };
-
-                  ws.onclose = function (evt) {
-                	  console.log("WebSocket close");
-                	  console.log(evt);
-                	  
-                	  // https://www.rfc-editor.org/rfc/rfc6455#section-7.4.1
-                	  appendResults("Warning: WebSocket closed (" + evt.code + ")");
-                  };
+        		  if (!window.wsconnecting) {
+	        		  window.wsconnecting = true;
+	        		  
+	            	  var websocketUrl = window.location.protocol === 'https:' ? "wss://" : "ws://";
+	            	  websocketUrl += window.location.host + "/GeolocationWebSocket";
+	            	  console.log("Initiating web socket to " + websocketUrl);
+	            	  
+	            	  if (window.reconnecting) {
+	            		  appendResults("Reconnecting...");
+	            	  }
+	            	  
+	                  window.ws = new WebSocket(websocketUrl);
+	                  
+	                  window.ws.onopen = function () {
+	                	  console.log("WebSocket successfully opened");
+	                	  
+	                	  window.wsready = true;
+	                	  window.wsconnecting = false;
+	                	  
+	                	  appendResults("Connected");
+	                	  
+	                	  // Some environments aggressively clean up idle sockets
+	                	  // and WebSockets are not immune, so we just send
+	                	  // a dummy ping message periodicaly
+	                	  setInterval(pingWebSocket, 15000);
+	                  };
+	
+	                  window.ws.onmessage = function (evt) {
+	                	  console.log("WebSocket received message");
+	                	  console.log(evt);
+	                	  handleResult(evt.data);
+	                  };
+	
+	                  window.ws.onerror = function (evt) {
+	                	  window.ws = null;
+	                	  window.wsready = false;
+	                	  window.wsconnecting = false;
+	                	  console.log("WebSocket error");
+	                	  console.log(evt);
+	                	  handleResult("ERROR: WebSocket received an error");
+	                	  setTimeout(tryReconnectWebSocket, 5000);
+	                  };
+	
+	                  window.ws.onclose = function (evt) {
+	                	  window.ws = null;
+	                	  window.wsready = false;
+	                	  window.wsconnecting = false;
+	                	  console.log("WebSocket close");
+	                	  console.log(evt);
+	                	  
+	                	  // https://www.rfc-editor.org/rfc/rfc6455#section-7.4.1
+	                	  appendResults("Warning: WebSocket closed (" + evt.code + ")");
+	                	  
+	                	  // A close can either happen as the browser is refreshing or navigating
+	                	  // away, which is normal, or for some problematic reason.
+	                	  // To avoid handling the former case, we only try re-starting the
+	                	  // connection after a bit of time.
+	                	  setTimeout(tryReconnectWebSocket, 5000);
+	                  };        			  
+        		  }
               } else {
         		  appendResults("ERROR: WebSockets not supported or not enabled in this browser.");
         	  }
@@ -118,7 +160,12 @@
     		  i = str.indexOf(' ');
     		  var longitude = parseFloat(str.substring(0, i));
     		  str = str.substring(i + 1);
-        	  appendResults("Welcome: " + str);
+    		  
+    		  if (str.indexOf("received an error") == -1) {
+            	  appendResults("Welcome: " + str);
+    		  } else {
+            	  appendResults(str);
+    		  }
         	  
         	  const marker = new AdvancedMarkerElement({
        		    map: window.map,

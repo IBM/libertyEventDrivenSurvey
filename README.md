@@ -82,65 +82,12 @@
    ```
    kn service list surveyadminservice
    ```
-1. Get the URL of the service:
-   ```
-   kn service list surveyadminservice -o jsonpath="{.items[0].status.url}{'\n'}"
-   ```
-1. Open your browser to this URL.
-1. Click on `Location Survey`
-
-#### Deploy surveyInputService
-
-1. Push `surveyInputService` to the registry:
-   ```
-   REGISTRY=$(oc get route default-route -n openshift-image-registry --template='{{ .spec.host }}')
-   echo "Registry host: ${REGISTRY}"
-   printf "Does it look good (yes=ENTER, no=Ctrl^C)? "
-   read trash
-   podman login --tls-verify=false -u $(oc whoami) -p $(oc whoami -t) ${REGISTRY}
-   podman tag localhost/surveyinputservice $REGISTRY/libertysurvey/surveyinputservice
-   podman push --tls-verify=false $REGISTRY/libertysurvey/surveyinputservice
-   ```
-1. Check the current project is the right one:
-   ```
-   oc project
-   ```
-1. Create a KNative Service for `surveyInputService` replacing the `kafka.bootstrap.servers` envar value with the AMQ Streams Kafka Cluster bootstrap address:
-   ```
-   apiVersion: serving.knative.dev/v1
-   kind: Service
-   metadata:
-     name: surveyinputservice
-   spec:
-     template:
-       metadata:
-         annotations:
-           autoscaling.knative.dev/scale-down-delay: "15m"
-       spec:
-         containers:
-         - name: surveyinputservice
-           image: image-registry.openshift-image-registry.svc:5000/libertysurvey/surveyinputservice
-           imagePullPolicy: Always
-           env:
-           - name: kafka.bootstrap.servers
-             value: my-cluster-kafka-bootstrap.amq-streams-kafka.svc:9092
-   ```
-   Apply:
-   ```
-   oc apply -f doc/example_surveyinputservice.yaml
-   ```
-1. Query until `READY` is `True`:
-   ```
-   kn service list surveyinputservice
-   ```
-1. Access the URL to drive pod creation:
-   ```
-   curl -k "$(kn service list surveyinputservice -o jsonpath="{.items[0].status.url}{'\n'}")"
-   ```
 1. Double check logs look good:
    ```
-   oc exec -it $(oc get pod -o name | grep surveyinputservice) -c surveyinputservice -- cat /logs/messages.log
+   oc exec -it $(oc get pod -o name | grep surveyadminservice) -c surveyadminservice -- cat /logs/messages.log
    ```
+1. Open your browser to the URL in the previous output.
+1. Click `Start New Geolocation Survey`
 
 #### Deploy surveyGeocoderService
 
@@ -217,6 +164,59 @@
 1. Query until `OK` is `++`:
    ```
    kn source kafka describe locationtopicsource
+   ```
+
+#### Deploy surveyInputService
+
+1. Push `surveyInputService` to the registry:
+   ```
+   REGISTRY=$(oc get route default-route -n openshift-image-registry --template='{{ .spec.host }}')
+   echo "Registry host: ${REGISTRY}"
+   printf "Does it look good (yes=ENTER, no=Ctrl^C)? "
+   read trash
+   podman login --tls-verify=false -u $(oc whoami) -p $(oc whoami -t) ${REGISTRY}
+   podman tag localhost/surveyinputservice $REGISTRY/libertysurvey/surveyinputservice
+   podman push --tls-verify=false $REGISTRY/libertysurvey/surveyinputservice
+   ```
+1. Check the current project is the right one:
+   ```
+   oc project
+   ```
+1. Create a KNative Service for `surveyInputService` replacing the `kafka.bootstrap.servers` envar value with the AMQ Streams Kafka Cluster bootstrap address:
+   ```
+   apiVersion: serving.knative.dev/v1
+   kind: Service
+   metadata:
+     name: surveyinputservice
+   spec:
+     template:
+       metadata:
+         annotations:
+           autoscaling.knative.dev/scale-down-delay: "15m"
+       spec:
+         containers:
+         - name: surveyinputservice
+           image: image-registry.openshift-image-registry.svc:5000/libertysurvey/surveyinputservice
+           imagePullPolicy: Always
+           env:
+           - name: kafka.bootstrap.servers
+             value: my-cluster-kafka-bootstrap.amq-streams-kafka.svc:9092
+   ```
+   Apply:
+   ```
+   oc apply -f doc/example_surveyinputservice.yaml
+   ```
+1. Query until `READY` is `True`:
+   ```
+   kn service list surveyinputservice
+   ```
+1. Access the URL to drive pod creation:
+   ```
+   curl -k "$(kn service list surveyinputservice -o jsonpath="{.items[0].status.url}{'\n'}")"
+   ```
+1. Double check logs look good:
+   ```
+   oc exec -it $(oc get pod -o name | grep surveyinputservice) -c surveyinputservice -- cat /logs/messages.log
    ```
 
 #### Test
