@@ -86,8 +86,18 @@
                 	  handleResult(evt.data);
                   };
 
-                  ws.onclose = function () {
-                	  appendResults("Warning: WebSocket closed");
+                  ws.onerror = function (evt) {
+                	  console.log("WebSocket error");
+                	  console.log(evt);
+                	  handleResult("ERROR: WebSocket received an error");
+                  };
+
+                  ws.onclose = function (evt) {
+                	  console.log("WebSocket close");
+                	  console.log(evt);
+                	  
+                	  // https://www.rfc-editor.org/rfc/rfc6455#section-7.4.1
+                	  appendResults("Warning: WebSocket closed (" + evt.code + ")");
                   };
               } else {
         		  appendResults("ERROR: WebSockets not supported or not enabled in this browser.");
