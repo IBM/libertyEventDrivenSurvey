@@ -86,7 +86,7 @@
    ```
    oc exec -it $(oc get pod -o name | grep surveyadminservice) -c surveyadminservice -- cat /logs/messages.log
    ```
-1. Open your browser to the URL in the previous output.
+1. Open your browser to the URL from the `kn service list` output above.
 1. Click `Start New Geolocation Survey`
 1. Create a KNative Eventing KafkaSource for `surveyAdminService` replacing `bootstrapServers` with the AMQ Streams Kafka Cluster bootstrap address:
    ```
@@ -272,15 +272,14 @@
 
 ##### Delete surveyAdminService
 
-```
-kn service delete surveyadminservice
-```
-
-##### Delete surveyInputService
-
-```
-kn service delete surveyinputservice
-```
+1. Delete the KafkaSource:
+   ```
+   kn source kafka delete geocodetopicsource
+   ```
+1. Delete the KNative Service:
+   ```
+   kn service delete surveyadminservice
+   ```
 
 ##### Delete surveyGeocoderService
 
@@ -292,6 +291,12 @@ kn service delete surveyinputservice
    ```
    kn service delete surveygeocoderservice
    ```
+
+##### Delete surveyInputService
+
+```
+kn service delete surveyinputservice
+```
 
 ### Testing Locally
 
