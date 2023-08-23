@@ -52,7 +52,7 @@
     	<main id="map">
     	</main>
 	    <footer>
-	    	<p id="results">Waiting for first result</p>
+	    	<p id="results">&nbsp;</p>
 	    </footer>
     </div>
     <script>
@@ -106,7 +106,7 @@
     		  i = str.indexOf(' ');
     		  let longitude = parseFloat(str.substring(0, i));
     		  str = str.substring(i + 1);
-        	  appendResults("Welcome from " + str + " (" + new Date().toLocaleTimeString() + ")");
+        	  appendResults("Welcome: " + str + " (" + new Date().toLocaleTimeString() + ")");
         	  
         	  const marker = new AdvancedMarkerElement({
        		    map: window.map,
