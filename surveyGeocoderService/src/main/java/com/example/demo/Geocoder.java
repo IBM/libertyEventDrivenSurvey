@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.maps.GeoApiContext;
 import com.google.maps.PlaceAutocompleteRequest.SessionToken;
 import com.google.maps.PlaceDetailsRequest.FieldMask;

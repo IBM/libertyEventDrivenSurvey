@@ -272,7 +272,7 @@ Only some functions can be tested locally without KNative.
      -H "Ce-Specversion: 1.0" \
      -H "Ce-Type: CloudEvent1" \
      -H "Content-Type: text/plain" \
-     -d "40.7127753 -74.0059728"
+     -d "40.7127753 -74.0059728 New York, NY"
    ```
 1. Switch back to the browser and you should see the point.
 
@@ -320,6 +320,11 @@ Only some functions can be tested locally without KNative.
      -H "Content-Type: text/plain" \
      -d "New York, NY"
    ```
+
+#### Testing without containers
+
+1. Change directory to the application
+1. `mvn clean liberty:dev`
 
 ## Learn More
 

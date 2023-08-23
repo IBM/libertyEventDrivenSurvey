@@ -71,7 +71,7 @@ public class CloudEventsProcessor {
 			if (LOG.isLoggable(Level.INFO))
 				LOG.info("Geocoded point: " + latitude + "," + longitude);
 			
-			emitter.send(Message.of(latitude + " " + longitude));
+			emitter.send(Message.of(latitude + " " + longitude + " " + location));
 
 			result = Response.ok().build();
 
