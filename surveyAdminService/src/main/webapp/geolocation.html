@@ -82,7 +82,7 @@
                   };
 
                   ws.onclose = function () {
-                	  console.log("WebSocket closed");
+                	  appendResults("WebSocket closed");
                   };
               } else {
         		  appendResults("ERROR: WebSockets not supported or not enabled in this browser.");
