@@ -19,6 +19,7 @@ cloud kubernetes as "Kubernetes" {
   collections surveyGeocoderService
   rectangle googleMaps as "Google Maps API"
   stack geocodetopic
+  collections knativeServing3 as "KNative Eventing"
   collections surveyAdminService
 }
 
@@ -30,7 +31,8 @@ knativeServing2 --> surveyGeocoderService : HTTP (CloudEvent)
 surveyGeocoderService --> googleMaps
 googleMaps --> surveyGeocoderService
 surveyGeocoderService ---# geocodetopic : Kafka Emitter
-geocodetopic #-> surveyAdminService : KafkaSource
+geocodetopic #-> knativeServing3 : KafkaSource
+knativeServing3 --> surveyAdminService : HTTP (CloudEvent)
 surveyAdminService --> admin
 
 @enduml
