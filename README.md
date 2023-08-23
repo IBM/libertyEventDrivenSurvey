@@ -263,7 +263,7 @@ Only some functions can be tested locally without KNative.
    ```
    podman run --privileged --rm -p 8080:8080 -p 8443:8443 -it localhost/surveyadminservice:latest
    ```
-1. Open browser to <http://localhost:8080/geolocation.html>
+1. Open browser to <http://localhost:8080/geolocation.jsp>
 1. Post a [`CloudEvent`](https://github.com/cloudevents/spec/blob/v1.0/spec.md#required-attributes):
    ```
    curl -X POST http://localhost:8080/api/cloudevents/geocodeComplete \
@@ -308,7 +308,7 @@ Only some functions can be tested locally without KNative.
    ```
 1. Run `surveyGeocoderService`:
    ```
-   podman run --privileged --rm -p 8080:8080 -p 8443:8443 -e "GOOGLE_API_KEY=..." -it localhost/surveygeocoderservice:latest
+   podman run --privileged --rm -p 8080:8080 -p 8443:8443 -e "GOOGLE_API_KEY=INSERT_API_KEY" -it localhost/surveygeocoderservice:latest
    ```
 1. Post a [`CloudEvent`](https://github.com/cloudevents/spec/blob/v1.0/spec.md#required-attributes):
    ```
@@ -324,7 +324,7 @@ Only some functions can be tested locally without KNative.
 #### Testing without containers
 
 1. Change directory to the application
-1. `mvn clean liberty:dev`
+1. `GOOGLE_API_KEY=INSERT_API_KEY mvn clean liberty:dev`
 
 ## Learn More
 
