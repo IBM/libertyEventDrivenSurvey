@@ -57,6 +57,7 @@
     </div>
     <script>
       function appendResults(str) {
+    	  str = str + " (" + new Date().toLocaleTimeString() + ")";
     	  var results = document.getElementById("results");
     	  if (results.initialized) {
     		  results.innerHTML = str + "<br />" + results.innerHTML;
@@ -69,7 +70,8 @@
       function openWebSocket() {
     	  try {
         	  if ('WebSocket' in window || 'MozWebSocket' in window) {
-            	  var websocketUrl = "ws://" + window.location.host + "/GeolocationWebSocket";
+            	  var websocketUrl = window.location.protocol === 'https:' ? "wss://" : "ws://";
+            	  websocketUrl += window.location.host + "/GeolocationWebSocket";
             	  console.log("Initiating web socket to " + websocketUrl);
             	  
                   ws = new WebSocket(websocketUrl);
@@ -85,7 +87,7 @@
                   };
 
                   ws.onclose = function () {
-                	  appendResults("WebSocket closed");
+                	  appendResults("Warning: WebSocket closed");
                   };
               } else {
         		  appendResults("ERROR: WebSockets not supported or not enabled in this browser.");
@@ -96,17 +98,17 @@
       }
       
       async function handleResult(str) {
-    	  let i = str.indexOf(' ');
+    	  var i = str.indexOf(' ');
     	  if (i != -1) {
 	    	  const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
 	    	  const { InfoWindow } = await google.maps.importLibrary("maps")
 
-	    	  let latitude = parseFloat(str.substring(0, i));
+	    	  var latitude = parseFloat(str.substring(0, i));
     		  str = str.substring(i + 1);
     		  i = str.indexOf(' ');
-    		  let longitude = parseFloat(str.substring(0, i));
+    		  var longitude = parseFloat(str.substring(0, i));
     		  str = str.substring(i + 1);
-        	  appendResults("Welcome: " + str + " (" + new Date().toLocaleTimeString() + ")");
+        	  appendResults("Welcome: " + str);
         	  
         	  const marker = new AdvancedMarkerElement({
        		    map: window.map,
@@ -115,15 +117,15 @@
        		  });
         	  
         	  const infowindow = new google.maps.InfoWindow({
-        		    content: str,
-        		  });
+       		    content: str,
+       		  });
         	  
         	  marker.addListener("click", () => {
-        		    infowindow.open({
-        		      anchor: marker,
-        		      map,
-        		    });
-        		  });
+       		    infowindow.open({
+       		      anchor: marker,
+       		      map,
+       		    });
+       		  });
     	  }
       }
       
