@@ -41,6 +41,10 @@
 
 #### Deploy surveyAdminService
 
+1. Check the current project is the right one:
+   ```
+   oc project
+   ```
 1. Push `surveyAdminService` to the registry:
    ```
    REGISTRY=$(oc get route default-route -n openshift-image-registry --template='{{ .spec.host }}')
@@ -211,10 +215,6 @@
    podman login --tls-verify=false -u $(oc whoami) -p $(oc whoami -t) ${REGISTRY}
    podman tag localhost/surveyinputservice $REGISTRY/libertysurvey/surveyinputservice
    podman push --tls-verify=false $REGISTRY/libertysurvey/surveyinputservice
-   ```
-1. Check the current project is the right one:
-   ```
-   oc project
    ```
 1. Create a KNative Service for `surveyInputService` replacing the `kafka.bootstrap.servers` envar value with the AMQ Streams Kafka Cluster bootstrap address:
    ```
