@@ -2,3 +2,4 @@ plantuml*.jar
 plantuml*.zip
 plantuml*.gz
 example_surveygeocoderservice.yaml
+example_surveyadminservice.yaml
