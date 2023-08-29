@@ -38,13 +38,21 @@
     1. Install [KNative Eventing](https://docs.openshift.com/serverless/1.29/install/installing-knative-eventing.html)
     1. Install the [`KNativeKafka` broker](https://docs.openshift.com/serverless/1.29/install/installing-knative-eventing.html#serverless-install-kafka-odc_installing-knative-eventing)
 1. Ensure the [internal OpenShift registry is available](https://publib.boulder.ibm.com/httpserv/cookbook/Troubleshooting_Recipes-Troubleshooting_OpenShift_Recipes-OpenShift_Use_Image_Registry_Recipe.html)
-
-#### Deploy surveyAdminService
-
 1. Check the current project is the right one:
    ```
    oc project
    ```
+1. Create a service account for InstantOn:
+   ```
+   oc create serviceaccount privilegedserviceaccount
+   ```
+1. Associate the service account with the privileged security context constraint (SCC):
+   ```
+   oc adm policy add-scc-to-user privileged -z privilegedserviceaccount
+   ```
+
+#### Deploy surveyAdminService
+
 1. Push `surveyAdminService` to the registry:
    ```
    REGISTRY=$(oc get route default-route -n openshift-image-registry --template='{{ .spec.host }}')
@@ -68,6 +76,7 @@
            autoscaling.knative.dev/min-scale: "1"
            autoscaling.knative.dev/max-scale: "1"
        spec:
+         serviceAccountName: privilegedserviceaccount
          containers:
          - name: surveyadminservice
            image: image-registry.openshift-image-registry.svc:5000/libertysurvey/surveyadminservice
@@ -77,6 +86,8 @@
              value: my-cluster-kafka-bootstrap.amq-streams-kafka.svc:9092
            - name: GOOGLE_API_KEY
              value: INSERT_API_KEY
+           securityContext:
+             privileged: true
    ```
    Apply:
    ```
@@ -145,8 +156,9 @@
      template:
        metadata:
          annotations:
-           autoscaling.knative.dev/scale-down-delay: "15m"
+           autoscaling.knative.dev/scale-down-delay: "0s"
        spec:
+         serviceAccountName: privilegedserviceaccount
          containers:
          - name: surveygeocoderservice
            image: image-registry.openshift-image-registry.svc:5000/libertysurvey/surveygeocoderservice
@@ -156,6 +168,8 @@
              value: my-cluster-kafka-bootstrap.amq-streams-kafka.svc:9092
            - name: GOOGLE_API_KEY
              value: INSERT_API_KEY
+           securityContext:
+             privileged: true
    ```
    Apply:
    ```
@@ -226,8 +240,9 @@
      template:
        metadata:
          annotations:
-           autoscaling.knative.dev/scale-down-delay: "15m"
+           autoscaling.knative.dev/scale-down-delay: "0s"
        spec:
+         serviceAccountName: privilegedserviceaccount
          containers:
          - name: surveyinputservice
            image: image-registry.openshift-image-registry.svc:5000/libertysurvey/surveyinputservice
@@ -235,6 +250,8 @@
            env:
            - name: kafka.bootstrap.servers
              value: my-cluster-kafka-bootstrap.amq-streams-kafka.svc:9092
+           securityContext:
+             privileged: true
    ```
    Apply:
    ```

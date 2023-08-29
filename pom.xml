@@ -75,6 +75,7 @@ under the License.
       <dependency.version.jakarta.websocket-api>2.1.0</dependency.version.jakarta.websocket-api>
       <dependency.version.jakarta.jakartaee-api>10.0.0</dependency.version.jakarta.jakartaee-api>
       <dependency.version.google-maps-services>2.2.0</dependency.version.google-maps-services>
+      <dependency.version.zxing>3.5.2</dependency.version.zxing>
   </properties>
 
   <modules>

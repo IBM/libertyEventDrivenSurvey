@@ -6,8 +6,9 @@ spec:
   template:
     metadata:
       annotations:
-        autoscaling.knative.dev/scale-down-delay: "15m"
+        autoscaling.knative.dev/scale-down-delay: "0s"
     spec:
+      serviceAccountName: privilegedserviceaccount
       containers:
       - name: surveyinputservice
         image: image-registry.openshift-image-registry.svc:5000/libertysurvey/surveyinputservice
@@ -15,3 +16,5 @@ spec:
         env:
         - name: kafka.bootstrap.servers
           value: my-cluster-kafka-bootstrap.amq-streams-kafka.svc:9092
+        securityContext:
+          privileged: true

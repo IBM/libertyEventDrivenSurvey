@@ -6,8 +6,9 @@ spec:
   template:
     metadata:
       annotations:
-        autoscaling.knative.dev/scale-down-delay: "15m"
+        autoscaling.knative.dev/scale-down-delay: "0s"
     spec:
+      serviceAccountName: privilegedserviceaccount
       containers:
       - name: surveygeocoderservice
         image: image-registry.openshift-image-registry.svc:5000/libertysurvey/surveygeocoderservice
@@ -17,3 +18,5 @@ spec:
           value: my-cluster-kafka-bootstrap.amq-streams-kafka.svc:9092
         - name: GOOGLE_API_KEY
           value: INSERT_API_KEY
+        securityContext:
+          privileged: true

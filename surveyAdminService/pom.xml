@@ -113,6 +113,16 @@ under the License.
       <version>${dependency.version.jakarta.websocket-api}</version>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>com.google.zxing</groupId>
+      <artifactId>core</artifactId>
+      <version>${dependency.version.zxing}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.zxing</groupId>
+      <artifactId>javase</artifactId>
+      <version>${dependency.version.zxing}</version>
+    </dependency>
   </dependencies>
   <build>
     <finalName>${project.artifactId}</finalName>

@@ -9,6 +9,7 @@ spec:
         autoscaling.knative.dev/min-scale: "1"
         autoscaling.knative.dev/max-scale: "1"
     spec:
+      serviceAccountName: privilegedserviceaccount
       containers:
       - name: surveyadminservice
         image: image-registry.openshift-image-registry.svc:5000/libertysurvey/surveyadminservice
@@ -18,3 +19,5 @@ spec:
           value: my-cluster-kafka-bootstrap.amq-streams-kafka.svc:9092
         - name: GOOGLE_API_KEY
           value: INSERT_API_KEY
+        securityContext:
+          privileged: true

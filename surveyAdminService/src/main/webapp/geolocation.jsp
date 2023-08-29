@@ -16,6 +16,7 @@
       display: flex;
       flex-direction: column;
       height: 100%;
+      position: relative;
     }
     
     main {
@@ -42,7 +43,51 @@
     h1 {
     	margin: 0;
     }
+    
+    #qrcode {
+    	position: absolute;
+    	bottom: 0;
+    	left: 0;
+    	height: auto;
+    }
+    
+    #sizecontrols {
+    	position: absolute;
+    	bottom: 0;
+    	left: 10px;
+    	display: flex;
+    	flex-direction: row;
+    }
+    
+    .pseudobutton {
+    	cursor: pointer;
+    	font-size: x-small;
+    }
     </style>
+    <script>
+    function increaseQRCode() {
+    	resizeQRCode(true);
+    }
+    function decreaseQRCode() {
+    	resizeQRCode(false);
+    }
+    function resizeQRCode(increase) {
+    	var qrcode = document.getElementById("qrcode");
+    	var styles = window.getComputedStyle(qrcode);
+    	var maxWidth = styles.getPropertyValue("width");
+    	if (maxWidth.includes("px")) {
+    		var current = parseInt(maxWidth.substring(0, maxWidth.indexOf("px")));
+    		if (increase) {
+    			current = parseInt(current * 1.1);
+    		} else {
+    			current = parseInt(current * 0.9);
+    		}
+    		qrcode.style.setProperty("width", current + "px");
+    	} else {
+    		alert("Unknown max-width format: " + maxWidth);
+    	}
+    }
+    </script>
   </head>
   <body>
     <div class="flexContainer">
@@ -54,6 +99,12 @@
 	    <footer>
 	    	<p id="results">&nbsp;</p>
 	    </footer>
+	    <img id="qrcode" src="qrcode.png" width="<%= com.example.demo.Configuration.QRCODE_WIDTH %>" />
+	    <div id="sizecontrols">
+	      <span class="pseudobutton" onclick="increaseQRCode()">+</span>
+	      &nbsp;
+	      <span class="pseudobutton" onclick="decreaseQRCode()">-</span>
+	    </div>
     </div>
     <script>
       function appendResults(str) {
@@ -100,7 +151,7 @@
 	                	  window.wsready = true;
 	                	  window.wsconnecting = false;
 	                	  
-	                	  appendResults("Connected");
+	                	  appendResults("<%= com.example.demo.Configuration.isGoogleAPIKeyConfigured() ? "Connected" : "Error: GOOGLE_API_KEY not specified" %>");
 	                	  
 	                	  // Some environments aggressively clean up idle sockets
 	                	  // and WebSockets are not immune, so we just send
@@ -208,7 +259,7 @@
       
       // Load Google Maps JS API
       (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.\${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})
-      ({key: "<%= System.getenv("GOOGLE_API_KEY") %>", v: "weekly"});
+      ({key: "<%= com.example.demo.Configuration.getGoogleAPIKey() %>", v: "weekly"});
       
       initMap();
       
