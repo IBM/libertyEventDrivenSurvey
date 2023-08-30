@@ -8,7 +8,7 @@ spec:
       annotations:
         autoscaling.knative.dev/scale-down-delay: "0s"
     spec:
-      serviceAccountName: privilegedserviceaccount
+      serviceAccountName: instanton-sa
       containers:
       - name: surveyinputservice
         image: image-registry.openshift-image-registry.svc:5000/libertysurvey/surveyinputservice
@@ -17,4 +17,12 @@ spec:
         - name: kafka.bootstrap.servers
           value: my-cluster-kafka-bootstrap.amq-streams-kafka.svc:9092
         securityContext:
-          privileged: true
+          allowPrivilegeEscalation: true
+          privileged: false
+          runAsNonRoot: true
+          capabilities:
+            add:
+            - CHECKPOINT_RESTORE
+            - SETPCAP
+            drop:
+            - ALL

@@ -8,7 +8,7 @@ spec:
       annotations:
         autoscaling.knative.dev/scale-down-delay: "0s"
     spec:
-      serviceAccountName: privilegedserviceaccount
+      serviceAccountName: instanton-sa
       containers:
       - name: surveygeocoderservice
         image: image-registry.openshift-image-registry.svc:5000/libertysurvey/surveygeocoderservice
@@ -19,4 +19,12 @@ spec:
         - name: GOOGLE_API_KEY
           value: INSERT_API_KEY
         securityContext:
-          privileged: true
+          allowPrivilegeEscalation: true
+          privileged: false
+          runAsNonRoot: true
+          capabilities:
+            add:
+            - CHECKPOINT_RESTORE
+            - SETPCAP
+            drop:
+            - ALL

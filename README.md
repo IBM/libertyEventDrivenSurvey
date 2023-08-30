@@ -56,11 +56,11 @@
    ```
    oc create serviceaccount instanton-sa
    ```
-1. Create a SecurityContextConstraints:
+1. Create an InstantOn SecurityContextConstraints:
    ```
-   oc apply -f doc/scc-cap-cr.yaml
+   oc apply -f doc/instantonscc.yaml
    ```
-1. Associate the SecurityContextConstraints with the service account:
+1. Associate the InstantOn SecurityContextConstraints with the service account:
    ```
    oc adm policy add-scc-to-user cap-cr-scc -z instanton-sa
    ```
@@ -195,7 +195,7 @@
          annotations:
            autoscaling.knative.dev/scale-down-delay: "0s"
        spec:
-         serviceAccountName: privilegedserviceaccount
+         serviceAccountName: instanton-sa
          containers:
          - name: surveygeocoderservice
            image: image-registry.openshift-image-registry.svc:5000/libertysurvey/surveygeocoderservice
@@ -206,7 +206,15 @@
            - name: GOOGLE_API_KEY
              value: INSERT_API_KEY
            securityContext:
-             privileged: true
+             allowPrivilegeEscalation: true
+             privileged: false
+             runAsNonRoot: true
+             capabilities:
+               add:
+               - CHECKPOINT_RESTORE
+               - SETPCAP
+               drop:
+               - ALL
    ```
    Apply:
    ```
@@ -279,7 +287,7 @@
          annotations:
            autoscaling.knative.dev/scale-down-delay: "0s"
        spec:
-         serviceAccountName: privilegedserviceaccount
+         serviceAccountName: instanton-sa
          containers:
          - name: surveyinputservice
            image: image-registry.openshift-image-registry.svc:5000/libertysurvey/surveyinputservice
@@ -288,7 +296,15 @@
            - name: kafka.bootstrap.servers
              value: my-cluster-kafka-bootstrap.amq-streams-kafka.svc:9092
            securityContext:
-             privileged: true
+             allowPrivilegeEscalation: true
+             privileged: false
+             runAsNonRoot: true
+             capabilities:
+               add:
+               - CHECKPOINT_RESTORE
+               - SETPCAP
+               drop:
+               - ALL
    ```
    Apply:
    ```
