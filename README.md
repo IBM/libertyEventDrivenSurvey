@@ -79,6 +79,63 @@
    oc apply -f knative_config.yaml
    ```
 
+#### Deploy surveyInputService
+
+1. Push `surveyInputService` to the registry:
+   ```
+   REGISTRY=$(oc get route default-route -n openshift-image-registry --template='{{ .spec.host }}')
+   echo "Registry host: ${REGISTRY}"
+   printf "Does it look good (yes=ENTER, no=Ctrl^C)? "
+   read trash
+   podman login --tls-verify=false -u $(oc whoami | sed 's/://g') -p $(oc whoami -t) ${REGISTRY}
+   podman tag localhost/surveyinputservice $REGISTRY/libertysurvey/surveyinputservice
+   podman push --tls-verify=false $REGISTRY/libertysurvey/surveyinputservice
+   ```
+1. Create a KNative Service for `surveyInputService` replacing the `kafka.bootstrap.servers` envar value with the AMQ Streams Kafka Cluster bootstrap address:
+   ```
+   apiVersion: serving.knative.dev/v1
+   kind: Service
+   metadata:
+     name: surveyinputservice
+   spec:
+     template:
+       metadata:
+         annotations:
+           autoscaling.knative.dev/scale-down-delay: "0s"
+       spec:
+         serviceAccountName: instanton-sa
+         containers:
+         - name: surveyinputservice
+           image: image-registry.openshift-image-registry.svc:5000/libertysurvey/surveyinputservice
+           imagePullPolicy: Always
+           env:
+           - name: kafka.bootstrap.servers
+             value: my-cluster-kafka-bootstrap.amq-streams-kafka.svc:9092
+           securityContext:
+             allowPrivilegeEscalation: true
+             privileged: false
+             runAsNonRoot: true
+             capabilities:
+               add:
+               - CHECKPOINT_RESTORE
+               - SETPCAP
+               drop:
+               - ALL
+   ```
+   Apply:
+   ```
+   oc apply -f doc/example_surveyinputservice.yaml
+   ```
+1. Query until `READY` is `True`:
+   ```
+   kn service list surveyinputservice
+   ```
+1. Open your browser to the URL from the `kn service list` output above.
+1. Double check logs look good:
+   ```
+   oc exec -it $(oc get pod -o name | grep surveyinputservice) -c surveyinputservice -- cat /logs/messages.log
+   ```
+
 #### Deploy surveyAdminService
 
 1. Push `surveyAdminService` to the registry:
@@ -91,7 +148,7 @@
    podman tag localhost/surveyadminservice $REGISTRY/libertysurvey/surveyadminservice
    podman push --tls-verify=false $REGISTRY/libertysurvey/surveyadminservice
    ```
-1. Create a KNative Service for `surveyAdminService` replacing `INSERT_API_KEY` with your Google Maps API key and the `kafka.bootstrap.servers` envar value with the AMQ Streams Kafka Cluster bootstrap address:
+1. Create a KNative Service for `surveyAdminService` replacing `INSERT_API_KEY` with your Google Maps API key, `INSERT_URL` with the URL from the `serviceInputService` above, and `kafka.bootstrap.servers` with the AMQ Streams Kafka Cluster bootstrap address:
    ```
    apiVersion: serving.knative.dev/v1
    kind: Service
@@ -114,6 +171,8 @@
              value: my-cluster-kafka-bootstrap.amq-streams-kafka.svc:9092
            - name: GOOGLE_API_KEY
              value: INSERT_API_KEY
+           - name: QRCODE_URL
+             value: INSERT_URL
            securityContext:
              allowPrivilegeEscalation: true
              privileged: false
@@ -135,7 +194,6 @@
    ```
 1. Double check logs look good:
    ```
-   oc logs $(oc get pod -o name | grep surveyadminservice)
    oc exec -it $(oc get pod -o name | grep surveyadminservice) -c surveyadminservice -- cat /logs/messages.log
    ```
 1. Open your browser to the URL from the `kn service list` output above.
@@ -261,66 +319,6 @@
 1. Tail the main pod logs:
    ```
    oc exec -it $(oc get pod -o name | grep surveygeocoderservice) -c surveygeocoderservice -- tail -f /logs/messages.log
-   ```
-
-#### Deploy surveyInputService
-
-1. Push `surveyInputService` to the registry:
-   ```
-   REGISTRY=$(oc get route default-route -n openshift-image-registry --template='{{ .spec.host }}')
-   echo "Registry host: ${REGISTRY}"
-   printf "Does it look good (yes=ENTER, no=Ctrl^C)? "
-   read trash
-   podman login --tls-verify=false -u $(oc whoami | sed 's/://g') -p $(oc whoami -t) ${REGISTRY}
-   podman tag localhost/surveyinputservice $REGISTRY/libertysurvey/surveyinputservice
-   podman push --tls-verify=false $REGISTRY/libertysurvey/surveyinputservice
-   ```
-1. Create a KNative Service for `surveyInputService` replacing the `kafka.bootstrap.servers` envar value with the AMQ Streams Kafka Cluster bootstrap address:
-   ```
-   apiVersion: serving.knative.dev/v1
-   kind: Service
-   metadata:
-     name: surveyinputservice
-   spec:
-     template:
-       metadata:
-         annotations:
-           autoscaling.knative.dev/scale-down-delay: "0s"
-       spec:
-         serviceAccountName: instanton-sa
-         containers:
-         - name: surveyinputservice
-           image: image-registry.openshift-image-registry.svc:5000/libertysurvey/surveyinputservice
-           imagePullPolicy: Always
-           env:
-           - name: kafka.bootstrap.servers
-             value: my-cluster-kafka-bootstrap.amq-streams-kafka.svc:9092
-           securityContext:
-             allowPrivilegeEscalation: true
-             privileged: false
-             runAsNonRoot: true
-             capabilities:
-               add:
-               - CHECKPOINT_RESTORE
-               - SETPCAP
-               drop:
-               - ALL
-   ```
-   Apply:
-   ```
-   oc apply -f doc/example_surveyinputservice.yaml
-   ```
-1. Query until `READY` is `True`:
-   ```
-   kn service list surveyinputservice
-   ```
-1. Access the URL to drive pod creation:
-   ```
-   curl -k "$(kn service list surveyinputservice -o jsonpath="{.items[0].status.url}{'\n'}")"
-   ```
-1. Double check logs look good:
-   ```
-   oc exec -it $(oc get pod -o name | grep surveyinputservice) -c surveyinputservice -- cat /logs/messages.log
    ```
 
 #### Test

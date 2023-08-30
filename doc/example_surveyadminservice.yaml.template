@@ -19,6 +19,8 @@ spec:
           value: my-cluster-kafka-bootstrap.amq-streams-kafka.svc:9092
         - name: GOOGLE_API_KEY
           value: INSERT_API_KEY
+        - name: QRCODE_URL
+          value: INSERT_URL
         securityContext:
           allowPrivilegeEscalation: true
           privileged: false
