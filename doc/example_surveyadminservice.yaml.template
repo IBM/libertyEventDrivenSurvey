@@ -9,7 +9,7 @@ spec:
         autoscaling.knative.dev/min-scale: "1"
         autoscaling.knative.dev/max-scale: "1"
     spec:
-      serviceAccountName: privilegedserviceaccount
+      serviceAccountName: instanton-sa
       containers:
       - name: surveyadminservice
         image: image-registry.openshift-image-registry.svc:5000/libertysurvey/surveyadminservice
@@ -20,4 +20,12 @@ spec:
         - name: GOOGLE_API_KEY
           value: INSERT_API_KEY
         securityContext:
-          privileged: true
+          allowPrivilegeEscalation: true
+          privileged: false
+          runAsNonRoot: true
+          capabilities:
+            add:
+            - CHECKPOINT_RESTORE
+            - SETPCAP
+            drop:
+            - ALL

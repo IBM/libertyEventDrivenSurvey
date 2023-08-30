@@ -64,6 +64,20 @@
    ```
    oc adm policy add-scc-to-user cap-cr-scc -z instanton-sa
    ```
+1. Dump the current knative-serving ConfigMap:
+   ```
+   oc get configmap config-features --namespace knative-serving -o yaml > knative_config.yaml
+   ```
+1. Edit knative_config.yaml and add the following attributes to the `data:` value:
+   ```
+   data:
+     kubernetes.podspec-securitycontext: "enabled"
+     kubernetes.containerspec-addcapabilities: "enabled"
+   ```
+1. Update the current knative-serving ConfigMap:
+   ```
+   oc apply -f knative_config.yaml
+   ```
 
 #### Deploy surveyAdminService
 
@@ -90,7 +104,7 @@
            autoscaling.knative.dev/min-scale: "1"
            autoscaling.knative.dev/max-scale: "1"
        spec:
-         serviceAccountName: privilegedserviceaccount
+         serviceAccountName: instanton-sa
          containers:
          - name: surveyadminservice
            image: image-registry.openshift-image-registry.svc:5000/libertysurvey/surveyadminservice
@@ -101,7 +115,15 @@
            - name: GOOGLE_API_KEY
              value: INSERT_API_KEY
            securityContext:
-             privileged: true
+             allowPrivilegeEscalation: true
+             privileged: false
+             runAsNonRoot: true
+             capabilities:
+               add:
+               - CHECKPOINT_RESTORE
+               - SETPCAP
+               drop:
+               - ALL
    ```
    Apply:
    ```
