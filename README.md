@@ -25,30 +25,44 @@
    mvn clean deploy
    ```
 
-### Deploy to OpenShift
+### Deploy to OpenShift >= 4.13
 
 #### Pre-requisities
 
 1. Install Kafka; for example, the [Red Hat AMQ Streams operator](https://access.redhat.com/documentation/en-us/red_hat_amq_streams/2.4/html/getting_started_with_amq_streams_on_openshift/proc-deploying-cluster-operator-hub-str)
-    1. Then, create a cluster, e.g. `my-cluster`
-    1. Create topics: `locationtopic`, `geocodetopic`
+    1. Then, create a cluster } Installed Operators } AMQ Streams } Kafka } Create Instance } my-cluster } Use all default options } Create
+    1. Wait for Condition: Ready. If you get a warning about "inter.broker.protocol.version", apply the [known workaround](https://access.redhat.com/solutions/7020156)
+    1. Create topics: locationtopic and geocodetopic
 1. Install KNative; for example, the [Red Hat OpenShift Serverless operator](https://docs.openshift.com/serverless/1.29/install/install-serverless-operator.html)
     1. Install the [`kn` command line utility](https://docs.openshift.com/serverless/1.29/install/installing-kn.html)
-    1. Install [KNative Serving](https://docs.openshift.com/serverless/1.29/install/installing-knative-serving.html)
-    1. Install [KNative Eventing](https://docs.openshift.com/serverless/1.29/install/installing-knative-eventing.html)
+    1. Install [KNative Serving](https://docs.openshift.com/serverless/1.29/install/installing-knative-serving.html) (use default options) and wait for the Ready=True Condition
+    1. Install [KNative Eventing](https://docs.openshift.com/serverless/1.29/install/installing-knative-eventing.html) (use default options) and wait for the Ready=True Condition
     1. Install the [`KNativeKafka` broker](https://docs.openshift.com/serverless/1.29/install/installing-knative-eventing.html#serverless-install-kafka-odc_installing-knative-eventing)
+        1. channel } enabled; bootstrapServers } my-cluster-kafka-bootstrap.amq-streams-kafka.svc:9092
+        1. source } enabled
+        1. broker } enabled; defaultConfig } bootstrapServers } my-cluster-kafka-bootstrap.amq-streams-kafka.svc:9092
+        1. sink } enabled
 1. Ensure the [internal OpenShift registry is available](https://publib.boulder.ibm.com/httpserv/cookbook/Troubleshooting_Recipes-Troubleshooting_OpenShift_Recipes-OpenShift_Use_Image_Registry_Recipe.html)
-1. Check the current project is the right one:
+1. Get a [Google Maps API key](https://developers.google.com/maps/documentation/javascript/get-api-key) (simple usage should fit [within the free tier](https://mapsplatform.google.com/pricing/))
+1. Check the current project is some test project name:
    ```
    oc project
    ```
+    1. If not, create and switch to some test project:
+       ```
+       oc new-project libertysurvey
+       ```
 1. Create a service account for InstantOn:
    ```
-   oc create serviceaccount privilegedserviceaccount
+   oc create serviceaccount instanton-sa
    ```
-1. Associate the service account with the privileged security context constraint (SCC):
+1. Create a SecurityContextConstraints:
    ```
-   oc adm policy add-scc-to-user privileged -z privilegedserviceaccount
+   oc apply -f doc/scc-cap-cr.yaml
+   ```
+1. Associate the SecurityContextConstraints with the service account:
+   ```
+   oc adm policy add-scc-to-user cap-cr-scc -z instanton-sa
    ```
 
 #### Deploy surveyAdminService
@@ -59,7 +73,7 @@
    echo "Registry host: ${REGISTRY}"
    printf "Does it look good (yes=ENTER, no=Ctrl^C)? "
    read trash
-   podman login --tls-verify=false -u $(oc whoami) -p $(oc whoami -t) ${REGISTRY}
+   podman login --tls-verify=false -u $(oc whoami | sed 's/://g') -p $(oc whoami -t) ${REGISTRY}
    podman tag localhost/surveyadminservice $REGISTRY/libertysurvey/surveyadminservice
    podman push --tls-verify=false $REGISTRY/libertysurvey/surveyadminservice
    ```
@@ -99,6 +113,7 @@
    ```
 1. Double check logs look good:
    ```
+   oc logs $(oc get pod -o name | grep surveyadminservice)
    oc exec -it $(oc get pod -o name | grep surveyadminservice) -c surveyadminservice -- cat /logs/messages.log
    ```
 1. Open your browser to the URL from the `kn service list` output above.
@@ -142,7 +157,7 @@
    echo "Registry host: ${REGISTRY}"
    printf "Does it look good (yes=ENTER, no=Ctrl^C)? "
    read trash
-   podman login --tls-verify=false -u $(oc whoami) -p $(oc whoami -t) ${REGISTRY}
+   podman login --tls-verify=false -u $(oc whoami | sed 's/://g') -p $(oc whoami -t) ${REGISTRY}
    podman tag localhost/surveygeocoderservice $REGISTRY/libertysurvey/surveygeocoderservice
    podman push --tls-verify=false $REGISTRY/libertysurvey/surveygeocoderservice
    ```
@@ -226,7 +241,7 @@
    echo "Registry host: ${REGISTRY}"
    printf "Does it look good (yes=ENTER, no=Ctrl^C)? "
    read trash
-   podman login --tls-verify=false -u $(oc whoami) -p $(oc whoami -t) ${REGISTRY}
+   podman login --tls-verify=false -u $(oc whoami | sed 's/://g') -p $(oc whoami -t) ${REGISTRY}
    podman tag localhost/surveyinputservice $REGISTRY/libertysurvey/surveyinputservice
    podman push --tls-verify=false $REGISTRY/libertysurvey/surveyinputservice
    ```
