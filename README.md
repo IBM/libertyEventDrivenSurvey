@@ -2,7 +2,7 @@
 
 `libertyEventDrivenSurvey` is an example event-driven survey application demonstrating [Liberty InstantOn](https://openliberty.io/docs/latest/instanton.html), CloudEvents, KNative, and MicroProfile Reactive Messaging 3. Architecture diagram for the location geocoding example:
 
-![Architecture diagram](doc/libertyEventDrivenSurvey-location.png)
+![Architecture diagram](lib/libertyEventDrivenSurvey-location.png)
 
 ## Development
 
@@ -58,7 +58,7 @@
    ```
 1. Create an InstantOn SecurityContextConstraints:
    ```
-   oc apply -f doc/instantonscc.yaml
+   oc apply -f lib/instantonscc.yaml
    ```
 1. Associate the InstantOn SecurityContextConstraints with the service account:
    ```
@@ -123,7 +123,7 @@
    ```
    Apply:
    ```
-   oc apply -f doc/example_surveyinputservice.yaml
+   oc apply -f lib/example_surveyinputservice.yaml
    ```
 1. Query until `READY` is `True`:
    ```
@@ -185,7 +185,7 @@
    ```
    Apply:
    ```
-   oc apply -f doc/example_surveyadminservice.yaml
+   oc apply -f lib/example_surveyadminservice.yaml
    ```
 1. Query until `READY` is `True`:
    ```
@@ -217,7 +217,7 @@
    ```
    Apply:
    ```
-   oc apply -f doc/example_surveyadminkafkasource.yaml
+   oc apply -f lib/example_surveyadminkafkasource.yaml
    ```
 1. Query until `OK` is `++`:
    ```
@@ -275,7 +275,7 @@
    ```
    Apply:
    ```
-   oc apply -f doc/example_surveygeocoderservice.yaml
+   oc apply -f lib/example_surveygeocoderservice.yaml
    ```
 1. Query until `READY` is `True`:
    ```
@@ -305,7 +305,7 @@
    ```
    Apply:
    ```
-   oc apply -f doc/example_surveygeocoderkafkasource.yaml
+   oc apply -f lib/example_surveygeocoderkafkasource.yaml
    ```
 1. Query until `OK` is `++`:
    ```
