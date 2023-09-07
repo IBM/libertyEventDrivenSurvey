@@ -64,20 +64,19 @@
    ```
    oc adm policy add-scc-to-user cap-cr-scc -z instanton-sa
    ```
-1. Dump the current knative-serving ConfigMap:
-   ```
-   oc get configmap config-features --namespace knative-serving -o yaml > knative_config.yaml
-   ```
-1. Edit knative_config.yaml and add the following attributes to the `data:` value:
-   ```
-   data:
-     kubernetes.podspec-securitycontext: "enabled"
-     kubernetes.containerspec-addcapabilities: "enabled"
-   ```
-1. Update the current knative-serving ConfigMap:
-   ```
-   oc apply -f knative_config.yaml
-   ```
+1. To use InstantOn, we need to modify KNative Serving configuration which [must be done](https://knative.dev/docs/install/operator/configuring-with-operator/) through the operator:
+    1. Go to the installed Serverless Operator in the `knative-eventing` namespace
+    1. Click `KNative Serving`
+    1. Click `knative-serving`
+    1. Click `YAML`
+    1. Under `spec`, add:
+       ```
+       config:
+         features:
+           kubernetes.containerspec-addcapabilities: enabled
+           kubernetes.podspec-securitycontext: enabled
+       ```
+    1. Click `Save`
 
 #### Deploy surveyInputService
 
@@ -192,11 +191,11 @@
    ```
    kn service list surveyadminservice
    ```
+1. Open your browser to the URL from the `kn service list` output above.
 1. Double check logs look good:
    ```
    oc exec -it $(oc get pod -o name | grep surveyadminservice) -c surveyadminservice -- cat /logs/messages.log
    ```
-1. Open your browser to the URL from the `kn service list` output above.
 1. Click `Start New Geolocation Survey`
 1. Create a KNative Eventing KafkaSource for `surveyAdminService` replacing `bootstrapServers` with the AMQ Streams Kafka Cluster bootstrap address:
    ```
@@ -281,10 +280,6 @@
 1. Query until `READY` is `True`:
    ```
    kn service list surveygeocoderservice
-   ```
-1. Access the URL to drive pod creation:
-   ```
-   curl -k "$(kn service list surveygeocoderservice -o jsonpath="{.items[0].status.url}{'\n'}")"
    ```
 1. Double check logs look good:
    ```
