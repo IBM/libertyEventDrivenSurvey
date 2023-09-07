@@ -4,6 +4,8 @@
 
 ![Architecture diagram](lib/libertyEventDrivenSurvey-location.png)
 
+![Screenshot](lib/screenshot.png)
+
 ## Development
 
 1. If using `podman machine`:
