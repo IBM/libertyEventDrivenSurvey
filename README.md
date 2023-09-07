@@ -129,7 +129,7 @@
    ```
    kn service list surveyinputservice
    ```
-1. Open your browser to the URL from the `kn service list` output above.
+1. Open your browser to the URL from the `kn service list` output above and click on `Location Survey`.
 1. Double check logs look good:
    ```
    oc exec -it $(oc get pod -o name | grep surveyinputservice) -c surveyinputservice -- cat /logs/messages.log
@@ -191,7 +191,7 @@
    ```
    kn service list surveyadminservice
    ```
-1. Open your browser to the URL from the `kn service list` output above.
+1. Open your browser to the URL from the `kn service list` output above and click on `Start New Geolocation Survey`.
 1. Double check logs look good:
    ```
    oc exec -it $(oc get pod -o name | grep surveyadminservice) -c surveyadminservice -- cat /logs/messages.log
@@ -219,7 +219,7 @@
    ```
    oc apply -f lib/example_surveyadminkafkasource.yaml
    ```
-1. Query until `OK` is `++`:
+1. Query until `OK` is `++` for all lines:
    ```
    kn source kafka describe geocodetopicsource
    ```
@@ -307,7 +307,7 @@
    ```
    oc apply -f lib/example_surveygeocoderkafkasource.yaml
    ```
-1. Query until `OK` is `++`:
+1. Query until `OK` is `++` for all lines:
    ```
    kn source kafka describe locationtopicsource
    ```
@@ -331,7 +331,7 @@
     1. Using the browser:
         1. Find and open the URL:
            ```
-           kn service list surveyinputservice -o jsonpath="{.items[0].status.url}{'\n'}"
+           kn service list surveyinputservice -o jsonpath="{.items[0].status.url}{'/location.html\n'}"
            ```
         1. Click `Location Survey` and submit the form
 1. Double check logs look good:
