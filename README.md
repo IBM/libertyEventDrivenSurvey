@@ -341,6 +341,10 @@
 
 #### Clean-up tasks
 
+```
+lib/cleanup_all.sh
+```
+
 ##### Delete surveyAdminService
 
 1. Delete the KafkaSource:
