@@ -4,7 +4,7 @@
 
 ![Screenshot](lib/screenshot.png)
 
-![Spinner](lib/spinner.webm)
+![Spinner](lib/spinner.gif)
 
 ![Architecture diagram](lib/libertyEventDrivenSurvey-location.png)
 
