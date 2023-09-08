@@ -76,6 +76,7 @@ under the License.
       <dependency.version.jakarta.jakartaee-api>10.0.0</dependency.version.jakarta.jakartaee-api>
       <dependency.version.google-maps-services>2.2.0</dependency.version.google-maps-services>
       <dependency.version.zxing>3.5.2</dependency.version.zxing>
+      <dependency.version.lucene-core>9.7.0</dependency.version.lucene-core>
   </properties>
 
   <modules>

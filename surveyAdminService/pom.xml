@@ -123,6 +123,11 @@ under the License.
       <artifactId>javase</artifactId>
       <version>${dependency.version.zxing}</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-core</artifactId>
+      <version>${dependency.version.lucene-core}</version>
+    </dependency>
   </dependencies>
   <build>
     <finalName>${project.artifactId}</finalName>

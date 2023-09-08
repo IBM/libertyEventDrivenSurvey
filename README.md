@@ -447,6 +447,7 @@ Only some functions can be tested locally without KNative.
 
 1. Change directory to the application
 1. `GOOGLE_API_KEY=INSERT_API_KEY mvn clean liberty:dev`
+1. Open <http://localhost:8080/>
 
 ## Learn More
 

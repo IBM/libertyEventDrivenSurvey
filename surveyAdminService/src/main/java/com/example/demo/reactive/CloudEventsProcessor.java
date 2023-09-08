@@ -20,7 +20,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.apache.lucene.util.SloppyMath;
 
+import com.example.demo.Configuration;
 import com.example.demo.websockets.GeolocationWebSocket;
 
 import io.cloudevents.CloudEvent;
@@ -61,8 +63,21 @@ public class CloudEventsProcessor {
 		if (LOG.isLoggable(Level.INFO))
 			LOG.info("Geocode results: " + geocodeResults);
 
+		// latitude ' ' longitude ' ' location
+		String latitudeStr = geocodeResults.substring(0, geocodeResults.indexOf(' '));
+		geocodeResults = geocodeResults.substring(geocodeResults.indexOf(' ') + 1);
+		String longitudeStr = geocodeResults.substring(0, geocodeResults.indexOf(' '));
+		geocodeResults = geocodeResults.substring(geocodeResults.indexOf(' ') + 1);
+
+		double latitude = Double.parseDouble(latitudeStr);
+		double longitude = Double.parseDouble(longitudeStr);
+		double approximateDistance = SloppyMath.haversinMeters(latitude, longitude, Configuration.getSurveyLatitude(),
+				Configuration.getSuveyLongitude());
+
+		String finalResults = latitude + " " + longitude + " " + approximateDistance + " " + geocodeResults;
+
 		try {
-			GeolocationWebSocket.sendMessageToAllBrowsers(geocodeResults);
+			GeolocationWebSocket.sendMessageToAllBrowsers(finalResults);
 		} catch (IOException e) {
 			if (LOG.isLoggable(Level.SEVERE))
 				LOG.log(Level.SEVERE, "Failed calling sendMessageToAllBrowsers", e);
