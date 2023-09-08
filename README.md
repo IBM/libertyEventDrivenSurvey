@@ -4,7 +4,7 @@
 
 ![Screenshot](lib/screenshot.png)
 
-![Spinner](lib/spinner.mp4)
+https://raw.githubusercontent.com/IBM/libertyEventDrivenSurvey/main/lib/spinner.mp4
 
 ![Architecture diagram](lib/libertyEventDrivenSurvey-location.png)
 
