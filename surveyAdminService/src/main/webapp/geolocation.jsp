@@ -219,7 +219,8 @@
 				];
 			}
 			const l = sourceData.length;
-			for (let i = 0; i < l; i++) {
+			const maxSegments = 25;
+			for (let i = 0; i < l && i < maxSegments; i++) {
 				if (i / l >= currentThreshold) {
 					currentThreshold += threshold;
 					segments.push({
