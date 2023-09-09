@@ -94,6 +94,7 @@
     	bottom: 0;
     	left: 0;
     	height: auto;
+		<%= "true".equals(request.getParameter("showqr")) ? "" : "display: none;" %>
     }
     
     #sizecontrols {
@@ -119,6 +120,7 @@
     }
     
     function resizeQRCode(increase) {
+		showQRCode();
     	var qrcode = document.getElementById("qrcode");
     	var styles = window.getComputedStyle(qrcode);
     	var maxWidth = styles.getPropertyValue("width");
@@ -139,6 +141,7 @@
     }
     
     function resetQRCode() {
+		showQRCode();
     	var qrcode = document.getElementById("qrcode");
     	if (qrcode.initialWidth) {
         	qrcode.style.setProperty("width", qrcode.initialWidth + "px");
@@ -165,6 +168,17 @@
 	function showQRCode() {
 		document.getElementById("qrcode").style.setProperty("display", "inherit");
 	}
+
+	function playSound() {
+		if (window.spinSound) {
+			// Stop and rewind the sound if it already happens to be playing.
+			window.spinSound.pause();
+			window.spinSound.currentTime = 0;
+
+			// Play the sound.
+			window.spinSound.play();
+		}
+	}
     
     function toggleSpinner() {
 		let spinner = document.getElementById("spinwheel");
@@ -172,6 +186,14 @@
 		if (styles.getPropertyValue("display") == "none") {
     		hideQRCode();
         	spinner.style.setProperty("display", "flex");
+
+			if (!window.spinSound) {
+				try {
+					window.spinSound = new Audio("media/tick.mp3");
+				} catch (e) {
+					console.log(e);
+				}
+			}
 
 			// https://github.com/zarocknz/javascript-winwheel
 			let currentColor = 0;
@@ -259,7 +281,9 @@
 					currentColor++;
 				}
 			}
-			console.dir(segments);
+			
+			console.log(segments);
+
 			window.theWheel = new Winwheel({
                 outerRadius: 212,
                 innerRadius: 75,
@@ -270,9 +294,11 @@
                 segments: segments,
                 animation: {
                     type: 'spinToStop',
-                    duration: 10,
-                    spins: 3,
+                    duration: 20,
+                    spins: 5,
                     callbackFinished: spinCompleted,
+					callbackSound: playSound,
+					soundTrigger: 'pin',
                 },
                 pins:
                 {
@@ -300,19 +326,39 @@
 	}
 
 	function farthestDistance() {
-		if (window.surveyResults) {
-			let farthest = null;
-			for (let surveyResult of window.surveyResults) {
-				if (farthest) {
-					if (surveyResult.distance > farthest.distance) {
-						farthest = surveyResult;
-					}
-				} else {
+		let search = window.surveyResults;
+		if (!search) {
+			search = [{
+    		    latitude: 40.7127753,
+    		    longitude: -74.0059728,
+    		    distance: 4057156,
+    		    name: "New York, NY",
+    		}];
+		}
+
+		let farthest = null;
+		for (let surveyResult of search) {
+			if (farthest) {
+				if (surveyResult.distance > farthest.distance) {
 					farthest = surveyResult;
 				}
+			} else {
+				farthest = surveyResult;
 			}
-			alert("Farthest location: " + farthest.name + " at " + (farthest.distance / 1000).toLocaleString(undefined, { maximumFractionDigits: 0 }) + "km")
 		}
+		let kilometers = farthest.distance / 1000;
+		let miles = kilometers * 0.621371;
+		let suffix = " miles";
+		let distance = miles;
+		<%
+		  if ("true".equals(request.getParameter("km"))) {
+		%>
+		distance = kilometers;
+		suffix = " kilometers";
+		<%
+		  }
+		%>
+		alert("Farthest location: " + farthest.name + " at " + distance.toLocaleString(undefined, { maximumFractionDigits: 0 }) + suffix);
 	}
 	</script>
   </head>

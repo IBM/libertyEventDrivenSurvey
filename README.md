@@ -104,7 +104,7 @@
      template:
        metadata:
          annotations:
-           autoscaling.knative.dev/scale-down-delay: "300s"
+           autoscaling.knative.dev/scale-down-delay: "2700s"
        spec:
          serviceAccountName: instanton-sa
          containers:
@@ -161,8 +161,8 @@
      template:
        metadata:
          annotations:
-           autoscaling.knative.dev/min-scale: "1"
            autoscaling.knative.dev/max-scale: "1"
+           autoscaling.knative.dev/scale-down-delay: "2700s"
        spec:
          serviceAccountName: instanton-sa
          containers:
@@ -254,7 +254,7 @@
      template:
        metadata:
          annotations:
-           autoscaling.knative.dev/scale-down-delay: "300s"
+           autoscaling.knative.dev/scale-down-delay: "2700s"
        spec:
          serviceAccountName: instanton-sa
          containers:
