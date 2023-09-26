@@ -21,6 +21,18 @@ under the License.
         <feature>websocket-2.1</feature>
     </featureManager>
 
-    <httpEndpoint id="defaultHttpEndpoint" host="*" httpPort="8080" httpsPort="8443" />
+    <httpEndpoint
+      id="defaultHttpEndpoint"
+      host="*"
+      httpPort="8080"
+      httpsPort="8443"
+      headersRef="addResponseHeaders"
+    />
+    <headers id="addResponseHeaders">
+      <add>Cache-Control: no-cache</add>
+    </headers>
+    
     <webApplication location="${project.name}.war" contextRoot="/"/>
+    
+    
 </server>
