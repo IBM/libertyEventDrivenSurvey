@@ -1,6 +1,8 @@
 # libertyEventDrivenSurvey
 
-`libertyEventDrivenSurvey` is an example event-driven survey application demonstrating [Liberty InstantOn](https://openliberty.io/docs/latest/instanton.html), CloudEvents, KNative, and MicroProfile Reactive Messaging 3. Architecture diagram for the location geocoding example:
+`libertyEventDrivenSurvey` is an example event-driven survey application demonstrating [Liberty InstantOn](https://openliberty.io/docs/latest/instanton.html), CloudEvents, KNative, and MicroProfile Reactive Messaging 3.
+
+## Screeenshots and Architecture for Geocoding
 
 ![Screenshot](lib/screenshot.png)
 
