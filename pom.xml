@@ -45,6 +45,7 @@ under the License.
       <image.builder>podman</image.builder>
       <image.authors>kevin.grigorenko@us.ibm.com</image.authors>
       <image.summary>${project.artifactId}</image.summary>
+      <image.platform>linux/amd64</image.platform>
       <!-- image.user is either blank or must be lower case and end with a / -->
       <image.user></image.user>
       <image.vendor>${image.user}</image.vendor>

@@ -205,6 +205,8 @@ under the License.
                     <echo level="info" message="Building ${image.repository}${image.user}${image.name}:${image.tag}" />
                     <exec dir="${project.basedir}" executable="${image.builder}" failonerror="true">
                       <arg value="build" />
+                      <arg value="--platform"/>
+                      <arg value="${image.platform}"/>
                       <arg value="--cap-add"/>
                       <arg value="CHECKPOINT_RESTORE"/>
                       <arg value="--cap-add" />
@@ -231,6 +233,8 @@ under the License.
                       <arg value="URL=${image.url}" />
                       <arg value="--build-arg" />
                       <arg value="SOURCE=${image.source}" />
+                      <arg value="--build-arg" />
+                      <arg value="VERBOSE=${image.verbose}" />
                       <arg value="--file" />
                       <arg value="Containerfile" />
                       <arg line="${image.builder.arguments}" />
