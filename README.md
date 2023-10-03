@@ -41,13 +41,17 @@
     1. Create topics: locationtopic and geocodetopic
 1. Install KNative; for example, the [Red Hat OpenShift Serverless operator](https://docs.openshift.com/serverless/1.29/install/install-serverless-operator.html)
     1. Install the [`kn` command line utility](https://docs.openshift.com/serverless/1.29/install/installing-kn.html)
+        1. Alternatively, install the latest version of [kn](https://knative.dev/docs/client/install-kn/#verifying-cli-binaries) and the [kafka plugin](https://knative.dev/docs/client/kn-plugins/#list-of-knative-plugins). For example, on macOS: `brew install knative/client/kn knative-sandbox/kn-plugins/source-kafka`
     1. Install [KNative Serving](https://docs.openshift.com/serverless/1.29/install/installing-knative-serving.html) (use default options) and wait for the Ready=True Condition
     1. Install [KNative Eventing](https://docs.openshift.com/serverless/1.29/install/installing-knative-eventing.html) (use default options) and wait for the Ready=True Condition
     1. Install the [`KNativeKafka` broker](https://docs.openshift.com/serverless/1.29/install/installing-knative-eventing.html#serverless-install-kafka-odc_installing-knative-eventing)
+        1. Set the project to `knative-eventing`
         1. channel } enabled; bootstrapServers } my-cluster-kafka-bootstrap.amq-streams-kafka.svc:9092
         1. source } enabled
         1. broker } enabled; defaultConfig } bootstrapServers } my-cluster-kafka-bootstrap.amq-streams-kafka.svc:9092
         1. sink } enabled
+        1. Click `Create`
+        1. Wait until the `Ready` condition
 1. Ensure the [internal OpenShift registry is available](https://publib.boulder.ibm.com/httpserv/cookbook/Troubleshooting_Recipes-Troubleshooting_OpenShift_Recipes-OpenShift_Use_Image_Registry_Recipe.html)
 1. Get a [Google Maps API key](https://developers.google.com/maps/documentation/javascript/get-api-key) (simple usage should fit [within the free tier](https://mapsplatform.google.com/pricing/))
 1. Check the current project is some test project name:
@@ -97,36 +101,6 @@
    podman push --tls-verify=false $REGISTRY/libertysurvey/surveyinputservice
    ```
 1. Create a KNative Service for `surveyInputService` replacing the `kafka.bootstrap.servers` envar value with the AMQ Streams Kafka Cluster bootstrap address:
-   ```
-   apiVersion: serving.knative.dev/v1
-   kind: Service
-   metadata:
-     name: surveyinputservice
-   spec:
-     template:
-       metadata:
-         annotations:
-           autoscaling.knative.dev/scale-down-delay: "2700s"
-       spec:
-         serviceAccountName: instanton-sa
-         containers:
-         - name: surveyinputservice
-           image: image-registry.openshift-image-registry.svc:5000/libertysurvey/surveyinputservice
-           imagePullPolicy: Always
-           env:
-           - name: kafka.bootstrap.servers
-             value: my-cluster-kafka-bootstrap.amq-streams-kafka.svc:9092
-           securityContext:
-             allowPrivilegeEscalation: true
-             privileged: false
-             runAsNonRoot: true
-             capabilities:
-               add:
-               - CHECKPOINT_RESTORE
-               - SETPCAP
-               drop:
-               - ALL
-   ```
    Apply:
    ```
    oc apply -f lib/example_surveyinputservice.yaml
@@ -153,43 +127,7 @@
    podman tag localhost/surveyadminservice $REGISTRY/libertysurvey/surveyadminservice
    podman push --tls-verify=false $REGISTRY/libertysurvey/surveyadminservice
    ```
-1. Create a KNative Service for `surveyAdminService` replacing `INSERT_API_KEY` with your Google Maps API key, `INSERT_URL` with the URL from the `serviceInputService` above, and `kafka.bootstrap.servers` with the AMQ Streams Kafka Cluster bootstrap address:
-   ```
-   apiVersion: serving.knative.dev/v1
-   kind: Service
-   metadata:
-     name: surveyadminservice
-   spec:
-     template:
-       metadata:
-         annotations:
-           autoscaling.knative.dev/max-scale: "1"
-           autoscaling.knative.dev/scale-down-delay: "2700s"
-       spec:
-         serviceAccountName: instanton-sa
-         containers:
-         - name: surveyadminservice
-           image: image-registry.openshift-image-registry.svc:5000/libertysurvey/surveyadminservice
-           imagePullPolicy: Always
-           env:
-           - name: kafka.bootstrap.servers
-             value: my-cluster-kafka-bootstrap.amq-streams-kafka.svc:9092
-           - name: GOOGLE_API_KEY
-             value: INSERT_API_KEY
-           - name: QRCODE_URL
-             value: INSERT_URL
-           securityContext:
-             allowPrivilegeEscalation: true
-             privileged: false
-             runAsNonRoot: true
-             capabilities:
-               add:
-               - CHECKPOINT_RESTORE
-               - SETPCAP
-               drop:
-               - ALL
-   ```
-   Apply:
+1. Copy `lib/example_surveyadminservice.yaml.template` into `lib/example_surveyadminservice.yaml` and replace `INSERT_API_KEY` with your Google Maps API key, `INSERT_URL` with the URL from the `serviceInputService` above, and `kafka.bootstrap.servers` with the AMQ Streams Kafka Cluster bootstrap address, and then:
    ```
    oc apply -f lib/example_surveyadminservice.yaml
    ```
@@ -203,25 +141,7 @@
    oc exec -it $(oc get pod -o name | grep surveyadminservice) -c surveyadminservice -- cat /logs/messages.log
    ```
 1. Click `Start New Geolocation Survey`
-1. Create a KNative Eventing KafkaSource for `surveyAdminService` replacing `bootstrapServers` with the AMQ Streams Kafka Cluster bootstrap address:
-   ```
-   apiVersion: sources.knative.dev/v1beta1
-   kind: KafkaSource
-   metadata:
-     name: geocodetopicsource
-   spec:
-     bootstrapServers:
-     - my-cluster-kafka-bootstrap.amq-streams-kafka.svc:9092
-     sink:
-       ref:
-         apiVersion: serving.knative.dev/v1
-         kind: Service
-         name: surveyadminservice
-       uri: "/api/cloudevents/geocodeComplete"
-     topics:
-     - geocodetopic
-   ```
-   Apply:
+1. Create a KNative Eventing KafkaSource for `surveyAdminService` (if needed, replace `bootstrapServers` with the AMQ Streams Kafka Cluster bootstrap address):
    ```
    oc apply -f lib/example_surveyadminkafkasource.yaml
    ```
@@ -246,40 +166,7 @@
    podman tag localhost/surveygeocoderservice $REGISTRY/libertysurvey/surveygeocoderservice
    podman push --tls-verify=false $REGISTRY/libertysurvey/surveygeocoderservice
    ```
-1. Create a KNative Service for `surveyGeocoderService` replacing `INSERT_API_KEY` with your Google Maps API key and the `kafka.bootstrap.servers` envar value with the AMQ Streams Kafka Cluster bootstrap address:
-   ```
-   apiVersion: serving.knative.dev/v1
-   kind: Service
-   metadata:
-     name: surveygeocoderservice
-   spec:
-     template:
-       metadata:
-         annotations:
-           autoscaling.knative.dev/scale-down-delay: "2700s"
-       spec:
-         serviceAccountName: instanton-sa
-         containers:
-         - name: surveygeocoderservice
-           image: image-registry.openshift-image-registry.svc:5000/libertysurvey/surveygeocoderservice
-           imagePullPolicy: Always
-           env:
-           - name: kafka.bootstrap.servers
-             value: my-cluster-kafka-bootstrap.amq-streams-kafka.svc:9092
-           - name: GOOGLE_API_KEY
-             value: INSERT_API_KEY
-           securityContext:
-             allowPrivilegeEscalation: true
-             privileged: false
-             runAsNonRoot: true
-             capabilities:
-               add:
-               - CHECKPOINT_RESTORE
-               - SETPCAP
-               drop:
-               - ALL
-   ```
-   Apply:
+1. Copy `lib/example_surveygeocoderservice.yaml.template` into `lib/example_surveygeocoderservice.yaml` and replace `INSERT_API_KEY` with your Google Maps API key and the `kafka.bootstrap.servers` envar value with the AMQ Streams Kafka Cluster bootstrap address, and then:
    ```
    oc apply -f lib/example_surveygeocoderservice.yaml
    ```
@@ -291,25 +178,7 @@
    ```
    oc exec -it $(oc get pod -o name | grep surveygeocoderservice) -c surveygeocoderservice -- cat /logs/messages.log
    ```
-1. Create a KNative Eventing KafkaSource for `surveyGeocoderService` replacing `bootstrapServers` with the AMQ Streams Kafka Cluster bootstrap address:
-   ```
-   apiVersion: sources.knative.dev/v1beta1
-   kind: KafkaSource
-   metadata:
-     name: locationtopicsource
-   spec:
-     bootstrapServers:
-     - my-cluster-kafka-bootstrap.amq-streams-kafka.svc:9092
-     sink:
-       ref:
-         apiVersion: serving.knative.dev/v1
-         kind: Service
-         name: surveygeocoderservice
-       uri: "/api/cloudevents/locationInput"
-     topics:
-     - locationtopic
-   ```
-   Apply:
+1. Create a KNative Eventing KafkaSource for `surveyGeocoderService` (if needed, replace `bootstrapServers` with the AMQ Streams Kafka Cluster bootstrap address):
    ```
    oc apply -f lib/example_surveygeocoderkafkasource.yaml
    ```
