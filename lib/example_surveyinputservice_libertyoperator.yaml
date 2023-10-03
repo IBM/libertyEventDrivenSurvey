@@ -2,11 +2,9 @@ apiVersion: liberty.websphere.ibm.com/v1
 kind: WebSphereLibertyApplication
 metadata:
   name: surveyinputservice
+  annotations:
+    autoscaling.knative.dev/scale-down-delay: "2700s"
 spec:
-  template:
-    metadata:
-      annotations:
-        autoscaling.knative.dev/scale-down-delay: "2700s"
   license:
     accept: true
     edition: IBM WebSphere Application Server
@@ -19,6 +17,8 @@ spec:
   env:
     - name: kafka.bootstrap.servers
       value: my-cluster-kafka-bootstrap.amq-streams-kafka.svc:9092
+    - name: OPENJ9_JAVA_OPTIONS
+      value: -XX:+JITServerLogConnections
   securityContext:
     capabilities:
       add:
