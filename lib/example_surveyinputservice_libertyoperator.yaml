@@ -11,14 +11,9 @@ spec:
     productEntitlementSource: Standalone
   service:
     port: 8080
-  semeruCloudCompiler:
-    enable: true
-    replicas: 1
   env:
     - name: kafka.bootstrap.servers
       value: my-cluster-kafka-bootstrap.amq-streams-kafka.svc:9092
-    - name: OPENJ9_JAVA_OPTIONS
-      value: -XX:+JITServerLogConnections
   securityContext:
     capabilities:
       add:
