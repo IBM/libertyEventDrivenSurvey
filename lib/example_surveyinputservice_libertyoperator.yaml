@@ -1,0 +1,36 @@
+apiVersion: liberty.websphere.ibm.com/v1
+kind: WebSphereLibertyApplication
+metadata:
+  name: surveyinputservice
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/scale-down-delay: "2700s"
+  license:
+    accept: true
+    edition: IBM WebSphere Application Server
+    productEntitlementSource: Standalone
+  semeruCloudCompiler:
+    enable: true
+    replicas: 1
+  env:
+    - name: kafka.bootstrap.servers
+      value: my-cluster-kafka-bootstrap.amq-streams-kafka.svc:9092
+  securityContext:
+    capabilities:
+      add:
+        - CHECKPOINT_RESTORE
+        - SETPCAP
+      drop:
+        - ALL
+    allowPrivilegeEscalation: true
+    runAsNonRoot: true
+  applicationImage: >-
+    image-registry.openshift-image-registry.svc:5000/libertysurvey/surveyinputservice
+  expose: true
+  manageTLS: true
+  replicas: 1
+  pullPolicy: Always
+  serviceAccountName: instanton-sa
+  createKnativeService: true

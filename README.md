@@ -48,7 +48,10 @@
         1. source } enabled
         1. broker } enabled; defaultConfig } bootstrapServers } my-cluster-kafka-bootstrap.amq-streams-kafka.svc:9092
         1. sink } enabled
-1. Ensure the [internal OpenShift registry is available](https://publib.boulder.ibm.com/httpserv/cookbook/Troubleshooting_Recipes-Troubleshooting_OpenShift_Recipes-OpenShift_Use_Image_Registry_Recipe.html)
+1. Ensure the [internal OpenShift registry is available](https://docs.openshift.com/container-platform/latest/registry/securing-exposing-registry.html):
+   ```
+   oc patch configs.imageregistry.operator.openshift.io/cluster --patch "{\"spec\":{\"defaultRoute\":true}}" --type=merge
+   ```
 1. Get a [Google Maps API key](https://developers.google.com/maps/documentation/javascript/get-api-key) (simple usage should fit [within the free tier](https://mapsplatform.google.com/pricing/))
 1. Check the current project is some test project name:
    ```
@@ -77,12 +80,15 @@
     1. Click `YAML`
     1. Under `spec`, add:
        ```
-       config:
-         features:
-           kubernetes.containerspec-addcapabilities: enabled
-           kubernetes.podspec-securitycontext: enabled
+         config:
+           features:
+             kubernetes.containerspec-addcapabilities: enabled
+             kubernetes.podspec-securitycontext: enabled
        ```
     1. Click `Save`
+1. Install the [WebSphere Liberty Operator](https://www.ibm.com/docs/en/was-liberty/base?topic=operator-installing-websphere-liberty)
+    1. Install the [IBM Operator Catalog](https://www.ibm.com/docs/en/cloud-paks/1.0?topic=clusters-adding-operator-catalog)
+    1. Install the IBM WebSphere Liberty Operator from OperatorHub
 
 #### Deploy surveyInputService
 
@@ -97,40 +103,45 @@
    podman push --tls-verify=false $REGISTRY/libertysurvey/surveyinputservice
    ```
 1. Create a KNative Service for `surveyInputService` replacing the `kafka.bootstrap.servers` envar value with the AMQ Streams Kafka Cluster bootstrap address:
-   ```
-   apiVersion: serving.knative.dev/v1
-   kind: Service
-   metadata:
-     name: surveyinputservice
-   spec:
-     template:
+    1. Vanilla KNative Service:
+       ```
+       apiVersion: serving.knative.dev/v1
+       kind: Service
        metadata:
-         annotations:
-           autoscaling.knative.dev/scale-down-delay: "2700s"
+         name: surveyinputservice
        spec:
-         serviceAccountName: instanton-sa
-         containers:
-         - name: surveyinputservice
-           image: image-registry.openshift-image-registry.svc:5000/libertysurvey/surveyinputservice
-           imagePullPolicy: Always
-           env:
-           - name: kafka.bootstrap.servers
-             value: my-cluster-kafka-bootstrap.amq-streams-kafka.svc:9092
-           securityContext:
-             allowPrivilegeEscalation: true
-             privileged: false
-             runAsNonRoot: true
-             capabilities:
-               add:
-               - CHECKPOINT_RESTORE
-               - SETPCAP
-               drop:
-               - ALL
-   ```
-   Apply:
-   ```
-   oc apply -f lib/example_surveyinputservice.yaml
-   ```
+         template:
+           metadata:
+             annotations:
+               autoscaling.knative.dev/scale-down-delay: "2700s"
+           spec:
+             serviceAccountName: instanton-sa
+             containers:
+             - name: surveyinputservice
+               image: image-registry.openshift-image-registry.svc:5000/libertysurvey/surveyinputservice
+               imagePullPolicy: Always
+               env:
+               - name: kafka.bootstrap.servers
+                 value: my-cluster-kafka-bootstrap.amq-streams-kafka.svc:9092
+               securityContext:
+                 allowPrivilegeEscalation: true
+                 privileged: false
+                 runAsNonRoot: true
+                 capabilities:
+                   add:
+                   - CHECKPOINT_RESTORE
+                   - SETPCAP
+                   drop:
+                   - ALL
+       ```
+       Apply:
+       ```
+       oc apply -f lib/example_surveyinputservice.yaml
+       ```
+    1. WebSphere Liberty Operator:
+       ```
+       oc apply -f lib/example_surveyinputservice_libertyoperator.yaml
+       ```
 1. Query until `READY` is `True`:
    ```
    kn service list surveyinputservice
