@@ -52,7 +52,10 @@
         1. sink } enabled
         1. Click `Create`
         1. Wait until the `Ready` condition
-1. Ensure the [internal OpenShift registry is available](https://publib.boulder.ibm.com/httpserv/cookbook/Troubleshooting_Recipes-Troubleshooting_OpenShift_Recipes-OpenShift_Use_Image_Registry_Recipe.html)
+1. Ensure the [internal OpenShift registry is available](https://docs.openshift.com/container-platform/latest/registry/securing-exposing-registry.html):
+   ```
+   oc patch configs.imageregistry.operator.openshift.io/cluster --patch "{\"spec\":{\"defaultRoute\":true}}" --type=merge
+   ```
 1. Get a [Google Maps API key](https://developers.google.com/maps/documentation/javascript/get-api-key) (simple usage should fit [within the free tier](https://mapsplatform.google.com/pricing/))
 1. Check the current project is some test project name:
    ```
