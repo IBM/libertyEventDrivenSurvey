@@ -11,6 +11,8 @@ spec:
     accept: true
     edition: IBM WebSphere Application Server
     productEntitlementSource: Standalone
+  service:
+    port: 8080
   semeruCloudCompiler:
     enable: true
     replicas: 1
@@ -29,7 +31,7 @@ spec:
   applicationImage: >-
     image-registry.openshift-image-registry.svc:5000/libertysurvey/surveyinputservice
   expose: true
-  manageTLS: true
+  manageTLS: false
   replicas: 1
   pullPolicy: Always
   serviceAccountName: instanton-sa

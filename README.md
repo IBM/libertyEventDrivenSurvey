@@ -105,37 +105,6 @@
 1. Create a KNative Service for `surveyInputService` replacing the `kafka.bootstrap.servers` envar value with the AMQ Streams Kafka Cluster bootstrap address:
     1. Vanilla KNative Service:
        ```
-       apiVersion: serving.knative.dev/v1
-       kind: Service
-       metadata:
-         name: surveyinputservice
-       spec:
-         template:
-           metadata:
-             annotations:
-               autoscaling.knative.dev/scale-down-delay: "2700s"
-           spec:
-             serviceAccountName: instanton-sa
-             containers:
-             - name: surveyinputservice
-               image: image-registry.openshift-image-registry.svc:5000/libertysurvey/surveyinputservice
-               imagePullPolicy: Always
-               env:
-               - name: kafka.bootstrap.servers
-                 value: my-cluster-kafka-bootstrap.amq-streams-kafka.svc:9092
-               securityContext:
-                 allowPrivilegeEscalation: true
-                 privileged: false
-                 runAsNonRoot: true
-                 capabilities:
-                   add:
-                   - CHECKPOINT_RESTORE
-                   - SETPCAP
-                   drop:
-                   - ALL
-       ```
-       Apply:
-       ```
        oc apply -f lib/example_surveyinputservice.yaml
        ```
     1. WebSphere Liberty Operator:
