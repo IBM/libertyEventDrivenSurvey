@@ -106,8 +106,9 @@
    oc adm policy add-scc-to-user cap-cr-scc -z instanton-sa
    ```
 1. To use InstantOn, we need to modify KNative Serving configuration which [must be done](https://knative.dev/docs/install/operator/configuring-with-operator/) through the operator:
-    1. Go to the installed Serverless Operator in the `knative-eventing` namespace
-    1. Click `KNative Serving`
+    1. Operators } Installed Operators
+    1. Project = `knative-serving`
+    1. Red Hat OpenShift Serverless } Knative Serving
     1. Click `knative-serving`
     1. Click `YAML`
     1. Under `spec`, add:
