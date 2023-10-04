@@ -132,8 +132,7 @@
    podman tag localhost/surveyinputservice $REGISTRY/libertysurvey/surveyinputservice
    podman push --tls-verify=false $REGISTRY/libertysurvey/surveyinputservice
    ```
-1. Create a KNative Service for `surveyInputService` replacing the `kafka.bootstrap.servers` envar value with the AMQ Streams Kafka Cluster bootstrap address:
-   Apply:
+1. Create a KNative Service for `surveyInputService` (if needed, replace `kafka.bootstrap.servers` with the AMQ Streams Kafka Cluster bootstrap address):
    ```
    oc apply -f lib/example_surveyinputservice.yaml
    ```
