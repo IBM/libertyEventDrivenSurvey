@@ -55,6 +55,14 @@
    ```
    oc patch configs.imageregistry.operator.openshift.io/cluster --patch "{\"spec\":{\"defaultRoute\":true}}" --type=merge
    ```
+1. Clone repository:
+   ```
+   git clone https://github.com/IBM/libertyEventDrivenSurvey
+   ```
+1. Change into the clone:
+   ```
+   cd libertyEventDrivenSurvey
+   ```
 1. Get a [Google Maps API key](https://developers.google.com/maps/documentation/javascript/get-api-key) (simple usage should fit [within the free tier](https://mapsplatform.google.com/pricing/))
 1. Check the current project is some test project name:
    ```
