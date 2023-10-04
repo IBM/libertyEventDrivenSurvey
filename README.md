@@ -38,14 +38,13 @@
 1. Install Kafka; for example, the [Red Hat AMQ Streams operator](https://access.redhat.com/documentation/en-us/red_hat_amq_streams/2.4/html/getting_started_with_amq_streams_on_openshift/proc-deploying-cluster-operator-hub-str)
     1. Then, create a cluster } Installed Operators } AMQ Streams } Kafka } Create Instance } my-cluster } Use all default options } Create
     1. Wait for Condition: Ready. If you get a warning about "inter.broker.protocol.version", apply the [known workaround](https://access.redhat.com/solutions/7020156)
-    1. Create topics: locationtopic and geocodetopic
+    1. Create topics: `locationtopic` and `geocodetopic`
 1. Install KNative; for example, the [Red Hat OpenShift Serverless operator](https://docs.openshift.com/serverless/1.29/install/install-serverless-operator.html)
     1. Install the [`kn` command line utility](https://docs.openshift.com/serverless/1.29/install/installing-kn.html)
         1. Alternatively, install the latest version of [kn](https://knative.dev/docs/client/install-kn/#verifying-cli-binaries) and the [kafka plugin](https://knative.dev/docs/client/kn-plugins/#list-of-knative-plugins). For example, on macOS: `brew install knative/client/kn knative-sandbox/kn-plugins/source-kafka`
-    1. Install [KNative Serving](https://docs.openshift.com/serverless/1.29/install/installing-knative-serving.html) (use default options) and wait for the Ready=True Condition
-    1. Install [KNative Eventing](https://docs.openshift.com/serverless/1.29/install/installing-knative-eventing.html) (use default options) and wait for the Ready=True Condition
+    1. Install [KNative Serving](https://docs.openshift.com/serverless/1.29/install/installing-knative-serving.html) (use default options) and wait for the `Ready=True` Condition
+    1. Install [KNative Eventing](https://docs.openshift.com/serverless/1.29/install/installing-knative-eventing.html) (use default options) and wait for the `Ready=True` Condition
     1. Install the [`KNativeKafka` broker](https://docs.openshift.com/serverless/1.29/install/installing-knative-eventing.html#serverless-install-kafka-odc_installing-knative-eventing)
-        1. Set the project to `knative-eventing`
         1. channel } enabled; bootstrapServers } my-cluster-kafka-bootstrap.amq-streams-kafka.svc:9092
         1. source } enabled
         1. broker } enabled; defaultConfig } bootstrapServers } my-cluster-kafka-bootstrap.amq-streams-kafka.svc:9092
