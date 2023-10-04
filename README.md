@@ -84,10 +84,10 @@
     1. Click `YAML`
     1. Under `spec`, add:
        ```
-       config:
-         features:
-           kubernetes.containerspec-addcapabilities: enabled
-           kubernetes.podspec-securitycontext: enabled
+         config:
+           features:
+             kubernetes.containerspec-addcapabilities: enabled
+             kubernetes.podspec-securitycontext: enabled
        ```
     1. Click `Save`
 
