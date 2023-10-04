@@ -76,6 +76,10 @@
    ```
    git clone https://github.com/IBM/libertyEventDrivenSurvey
    ```
+1. Change into the clone:
+   ```
+   cd libertyEventDrivenSurvey
+   ```
 1. Check the current project is some test project name:
    ```
    oc project
@@ -87,10 +91,6 @@
 1. Ensure the [internal OpenShift registry is available](https://docs.openshift.com/container-platform/latest/registry/securing-exposing-registry.html):
    ```
    oc patch configs.imageregistry.operator.openshift.io/cluster --patch "{\"spec\":{\"defaultRoute\":true}}" --type=merge
-   ```
-1. Change into the clone:
-   ```
-   cd libertyEventDrivenSurvey
    ```
 1. Get a [Google Maps API key](https://developers.google.com/maps/documentation/javascript/get-api-key) (simple usage should fit [within the free tier](https://mapsplatform.google.com/pricing/))
 1. Create a service account for InstantOn:
