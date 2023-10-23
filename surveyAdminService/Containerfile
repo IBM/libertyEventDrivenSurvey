@@ -31,6 +31,7 @@ ARG OPENJ9_SCC=true
 ARG OPENJ9_JAVA_OPTIONS=""
 ARG CONSOLE_FORMAT="simple"
 ARG CHECKPOINT_TYPE="beforeAppStart"
+ARG VERBOSE="false"
 
 # https://github.com/opencontainers/image-spec/blob/main/annotations.md#pre-defined-annotation-keys
 LABEL \
