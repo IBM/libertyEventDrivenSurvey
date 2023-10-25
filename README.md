@@ -145,6 +145,7 @@
    ```
    oc exec -it $(oc get pod -o name | grep surveyinputservice) -c surveyinputservice -- cat /logs/messages.log
    ```
+1. Note that `scale-down-delay` does not apply to the initial pod creation so the pod will be terminated about 30 seconds after it's initially created. Once a real user request is made to this application, then `scale-down-delay` will apply. Therefore, if you want to tail the logs of the pod, first wait for the initial pod to terminate and then make a request to the application and then you can tail the pod logs.
 
 #### Deploy surveyAdminService
 
@@ -185,6 +186,7 @@
    ```
    kn source kafka describe geocodetopicsource
    ```
+1. Note that `scale-down-delay` does not apply to the initial pod creation so the pod will be terminated about 30 seconds after it's initially created. Once a real user request is made to this application, then `scale-down-delay` will apply. Therefore, if you want to tail the logs of the pod, first wait for the initial pod to terminate and then make a request to the application and then you can tail the pod logs.
 
 #### Deploy surveyGeocoderService
 
@@ -221,6 +223,7 @@
    ```
    kn source kafka describe locationtopicsource
    ```
+1. Note that `scale-down-delay` does not apply to the initial pod creation so the pod will be terminated about 30 seconds after it's initially created. Once a real user request is made to this application, then `scale-down-delay` will apply. Therefore, if you want to tail the logs of the pod, first wait for the initial pod to terminate and then make a request to the application and then you can tail the pod logs.
 
 #### Test
 
