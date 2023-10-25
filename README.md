@@ -158,10 +158,15 @@
    podman tag localhost/surveyadminservice $REGISTRY/libertysurvey/surveyadminservice
    podman push --tls-verify=false $REGISTRY/libertysurvey/surveyadminservice
    ```
-1. Copy `lib/example_surveyadminservice.yaml.template` into `lib/example_surveyadminservice.yaml` and replace `INSERT_API_KEY` with your Google Maps API key, `INSERT_URL` with the URL from the `serviceInputService` above, and `kafka.bootstrap.servers` with the AMQ Streams Kafka Cluster bootstrap address, and then:
-   ```
-   oc apply -f lib/example_surveyadminservice.yaml
-   ```
+1. Copy `lib/example_surveyadminservice.yaml.template` into `lib/example_surveyadminservice.yaml`, and then:
+    1. Replace `INSERT_API_KEY` with your Google Maps API key
+    1. Replace `INSERT_URL` with the URL from the `serviceInputService` above appended with `location.html`
+    1. Replace `kafka.bootstrap.servers` with the AMQ Streams Kafka Cluster bootstrap address
+    1. If needed, replace `SURVEY_LATITUDE` and `SURVEY_LONGITUDE` (defaults to Las Vegas, NV, USA)
+    1. Run:
+       ```
+       oc apply -f lib/example_surveyadminservice.yaml
+       ```
 1. Query until `READY` is `True`:
    ```
    kn service list surveyadminservice
@@ -180,10 +185,6 @@
    ```
    kn source kafka describe geocodetopicsource
    ```
-1. Tail the main pod logs:
-   ```
-   oc exec -it $(oc get pod -o name | grep surveyadminservice) -c surveyadminservice -- tail -f /logs/messages.log
-   ```
 
 #### Deploy surveyGeocoderService
 
@@ -197,10 +198,13 @@
    podman tag localhost/surveygeocoderservice $REGISTRY/libertysurvey/surveygeocoderservice
    podman push --tls-verify=false $REGISTRY/libertysurvey/surveygeocoderservice
    ```
-1. Copy `lib/example_surveygeocoderservice.yaml.template` into `lib/example_surveygeocoderservice.yaml` and replace `INSERT_API_KEY` with your Google Maps API key and the `kafka.bootstrap.servers` envar value with the AMQ Streams Kafka Cluster bootstrap address, and then:
-   ```
-   oc apply -f lib/example_surveygeocoderservice.yaml
-   ```
+1. Copy `lib/example_surveygeocoderservice.yaml.template` into `lib/example_surveygeocoderservice.yaml`, and then:
+    1. Replace `INSERT_API_KEY` with your Google Maps API key
+    1. Replace `kafka.bootstrap.servers` with the AMQ Streams Kafka Cluster bootstrap address
+    1. Run:
+       ```
+       oc apply -f lib/example_surveygeocoderservice.yaml
+       ```
 1. Query until `READY` is `True`:
    ```
    kn service list surveygeocoderservice
@@ -216,10 +220,6 @@
 1. Query until `OK` is `++` for all lines:
    ```
    kn source kafka describe locationtopicsource
-   ```
-1. Tail the main pod logs:
-   ```
-   oc exec -it $(oc get pod -o name | grep surveygeocoderservice) -c surveygeocoderservice -- tail -f /logs/messages.log
    ```
 
 #### Test
@@ -241,6 +241,21 @@
            ```
         1. Click `Location Survey` and submit the form
 1. Double check logs look good:
+   ```
+   oc exec -it $(oc get pod -o name | grep surveygeocoderservice) -c surveygeocoderservice -- tail -f /logs/messages.log
+   ```
+
+#### Debugging
+
+1. Tail `surveyinputservice` logs:
+   ```
+   oc exec -it $(oc get pod -o name | grep surveyinputservice) -c surveyinputservice -- tail -f /logs/messages.log
+   ```
+1. Tail `surveyadminservice` logs:
+   ```
+   oc exec -it $(oc get pod -o name | grep surveyadminservice) -c surveyadminservice -- tail -f /logs/messages.log
+   ```
+1. Tail `surveygeocoderservice` logs:
    ```
    oc exec -it $(oc get pod -o name | grep surveygeocoderservice) -c surveygeocoderservice -- tail -f /logs/messages.log
    ```

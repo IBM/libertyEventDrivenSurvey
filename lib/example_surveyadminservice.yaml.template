@@ -21,6 +21,10 @@ spec:
           value: INSERT_API_KEY
         - name: QRCODE_URL
           value: INSERT_URL
+        - name: SURVEY_LATITUDE
+          value: "36.10212330390405"
+        - name: SURVEY_LONGITUDE
+          value: "-115.174411774675"
         securityContext:
           allowPrivilegeEscalation: true
           privileged: false
