@@ -14,4 +14,5 @@ oc apply -f lib/example_surveyinputservice.yaml && \
   kn service list surveygeocoderservice && \
   oc apply -f lib/example_surveygeocoderkafkasource.yaml && \
   sleep 30 && \
-  kn source kafka describe locationtopicsource
+  kn source kafka describe locationtopicsource && \
+  sleep 60
