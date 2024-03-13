@@ -31,8 +31,8 @@ under the License.
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
     <!-- Liberty options -->
-      <openliberty.maven.version>3.7.1</openliberty.maven.version>
-      <openliberty.version>23.0.0.6</openliberty.version>
+      <openliberty.maven.version>3.10</openliberty.maven.version>
+      <openliberty.version>24.0.0.2</openliberty.version>
       <checkpoint.type>beforeAppStart</checkpoint.type>
 
     <!-- Liberty configuration
@@ -63,13 +63,10 @@ under the License.
       <dependency.version.maven-deploy-plugin>3.1.1</dependency.version.maven-deploy-plugin>
       <dependency.version.maven-antrun-plugin>3.1.0</dependency.version.maven-antrun-plugin>
       <dependency.version.microprofile>6.0</dependency.version.microprofile>
-      <dependency.version.smallrye-reactive-messaging>4.5.0</dependency.version.smallrye-reactive-messaging>
-      <dependency.version.smallrye-reactive-streams-operators>1.0.13</dependency.version.smallrye-reactive-streams-operators>
-      <dependency.version.micrometer-core>1.10.6</dependency.version.micrometer-core>
+      <dependency.version.mpReactiveMessaging>3.0</dependency.version.mpReactiveMessaging>
       <dependency.version.kafka-clients>3.4.0</dependency.version.kafka-clients>
       <dependency.version.slf4j-api>2.0.7</dependency.version.slf4j-api>
       <dependency.version.slf4j-jdk14>2.0.7</dependency.version.slf4j-jdk14>
-      <dependency.version.rxjava>3.1.6</dependency.version.rxjava>
       <dependency.version.jakarta.servlet-api>6.0.0</dependency.version.jakarta.servlet-api>
       <dependency.version.cloudevents-http-restful-ws-jakarta>2.5.0</dependency.version.cloudevents-http-restful-ws-jakarta>
       <dependency.version.cloudevents-cloudevents-kafka>2.3.0</dependency.version.cloudevents-cloudevents-kafka>

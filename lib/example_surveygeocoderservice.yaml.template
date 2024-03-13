@@ -14,7 +14,7 @@ spec:
         image: image-registry.openshift-image-registry.svc:5000/libertysurvey/surveygeocoderservice
         imagePullPolicy: Always
         env:
-        - name: kafka.bootstrap.servers
+        - name: mp.messaging.connector.liberty-kafka.bootstrap.servers
           value: my-cluster-kafka-bootstrap.amq-streams-kafka.svc:9092
         - name: GOOGLE_API_KEY
           value: INSERT_API_KEY

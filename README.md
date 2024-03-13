@@ -132,7 +132,7 @@
    podman tag localhost/surveyinputservice $REGISTRY/libertysurvey/surveyinputservice
    podman push --tls-verify=false $REGISTRY/libertysurvey/surveyinputservice
    ```
-1. Create a KNative Service for `surveyInputService` (if needed, replace `kafka.bootstrap.servers` with the AMQ Streams Kafka Cluster bootstrap address):
+1. Create a KNative Service for `surveyInputService` (if needed, replace `mp.messaging.connector.liberty-kafka.bootstrap.servers` with the AMQ Streams Kafka Cluster bootstrap address):
    ```
    oc apply -f lib/example_surveyinputservice.yaml
    ```
@@ -162,7 +162,7 @@
 1. Copy `lib/example_surveyadminservice.yaml.template` into `lib/example_surveyadminservice.yaml`, and then:
     1. Replace `INSERT_API_KEY` with your Google Maps API key
     1. Replace `INSERT_URL` with the URL from the `serviceInputService` above appended with `location.html`
-    1. Replace `kafka.bootstrap.servers` with the AMQ Streams Kafka Cluster bootstrap address
+    1. Replace `mp.messaging.connector.liberty-kafka.bootstrap.servers` with the AMQ Streams Kafka Cluster bootstrap address
     1. If needed, replace `SURVEY_LATITUDE` and `SURVEY_LONGITUDE` (defaults to Las Vegas, NV, USA)
     1. Run:
        ```
@@ -202,7 +202,7 @@
    ```
 1. Copy `lib/example_surveygeocoderservice.yaml.template` into `lib/example_surveygeocoderservice.yaml`, and then:
     1. Replace `INSERT_API_KEY` with your Google Maps API key
-    1. Replace `kafka.bootstrap.servers` with the AMQ Streams Kafka Cluster bootstrap address
+    1. Replace `mp.messaging.connector.liberty-kafka.bootstrap.servers` with the AMQ Streams Kafka Cluster bootstrap address
     1. Run:
        ```
        oc apply -f lib/example_surveygeocoderservice.yaml
@@ -305,7 +305,7 @@ Only some functions can be tested locally without KNative.
 
 1. Run `surveyAdminService`:
    ```
-   podman run --privileged --rm -p 8080:8080 -p 8443:8443 -it localhost/surveyadminservice:latest
+   podman run --privileged --rm -e GOOGLE_API_KEY=YOUR_KEY -p 8080:8080 -p 8443:8443 -it localhost/surveyadminservice:latest
    ```
 1. Open browser to <http://localhost:8080/geolocation.jsp>
 1. Post a [`CloudEvent`](https://github.com/cloudevents/spec/blob/v1.0/spec.md#required-attributes):

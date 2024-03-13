@@ -19,6 +19,7 @@ under the License.
         <feature>webProfile-10.0</feature>
         <feature>microProfile-6.0</feature>
         <feature>websocket-2.1</feature>
+        <feature>mpReactiveMessaging-3.0</feature>
     </featureManager>
 
     <httpEndpoint

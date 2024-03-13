@@ -40,30 +40,10 @@ under the License.
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>io.smallrye.reactive</groupId>
-      <artifactId>smallrye-reactive-messaging</artifactId>
-      <version>${dependency.version.smallrye-reactive-messaging}</version>
-      <type>pom</type>
-    </dependency>
-    <dependency>
-      <groupId>io.smallrye.reactive</groupId>
-      <artifactId>smallrye-reactive-messaging-provider</artifactId>
-      <version>${dependency.version.smallrye-reactive-messaging}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.smallrye.reactive</groupId>
-      <artifactId>smallrye-reactive-messaging-kafka</artifactId>
-      <version>${dependency.version.smallrye-reactive-messaging}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.smallrye.reactive</groupId>
-      <artifactId>smallrye-reactive-streams-operators</artifactId>
-      <version>${dependency.version.smallrye-reactive-streams-operators}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.micrometer</groupId>
-      <artifactId>micrometer-core</artifactId>
-      <version>${dependency.version.micrometer-core}</version>
+      <groupId>org.eclipse.microprofile.reactive.messaging</groupId>
+      <artifactId>microprofile-reactive-messaging-api</artifactId>
+      <version>${dependency.version.mpReactiveMessaging}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.kafka</groupId>
@@ -71,24 +51,19 @@ under the License.
       <version>${dependency.version.kafka-clients}</version>
     </dependency>
     <dependency>
-      <groupId>com.google.maps</groupId>
-      <artifactId>google-maps-services</artifactId>
-      <version>${dependency.version.google-maps-services}</version>
-    </dependency>
-    <dependency> 
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
       <version>${dependency.version.slf4j-api}</version>
     </dependency>
-    <dependency> 
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-jdk14</artifactId>
       <version>${dependency.version.slf4j-jdk14}</version>
     </dependency>
     <dependency>
-      <groupId>io.reactivex.rxjava3</groupId>
-      <artifactId>rxjava</artifactId>
-      <version>${dependency.version.rxjava}</version>
+      <groupId>com.google.maps</groupId>
+      <artifactId>google-maps-services</artifactId>
+      <version>${dependency.version.google-maps-services}</version>
     </dependency>
     <dependency>
       <groupId>jakarta.servlet</groupId>

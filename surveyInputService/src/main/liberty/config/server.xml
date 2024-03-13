@@ -18,6 +18,7 @@ under the License.
     <featureManager>
         <feature>webProfile-10.0</feature>
         <feature>microProfile-6.0</feature>
+        <feature>mpReactiveMessaging-3.0</feature>
     </featureManager>
 
     <httpEndpoint
