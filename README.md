@@ -2,6 +2,8 @@
 
 `libertyEventDrivenSurvey` is an example event-driven survey application demonstrating [Liberty InstantOn](https://openliberty.io/docs/latest/instanton.html), CloudEvents, KNative, and MicroProfile Reactive Messaging 3.
 
+The way it works is that users scan a QR code presented by the person running the survey and users type in a location (e.g. New York). This is submitted to a microservice that can scale from zero using KNative Serving and quickly using Liberty InstantOn. This web service publishes the location to a Kafka topic. Another microservice that can scale from zero using KNative Eventing and the KNative Kafka Broker and quickly using Liberty InstantOn then receives this event and geocodes the location to a latitude and longitude through a Google Maps API. Finally, this pin works its way back through another Kafka topic and WebSockets back to the map that the person running the survey is showing.
+
 ## Screeenshots and Architecture for Geocoding
 
 ![Screenshot](lib/screenshot.png)
