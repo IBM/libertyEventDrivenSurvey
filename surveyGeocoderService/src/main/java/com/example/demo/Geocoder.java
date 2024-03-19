@@ -54,6 +54,9 @@ public class Geocoder {
 
 		/*-
 		 * TODO:
+		 * We can't serialize the results to a String using Gson because of the following error.
+		 * This is only for debug anyway, so not a big deal.
+		 * 
 		 * Caused by: java.lang.reflect.InaccessibleObjectException: Unable to make field private final byte java.time.LocalTime.hour accessible: module java.base does not "opens java.time" to unnamed module @73fd66b
 		 * [...]
 		 * 	at com.google.gson.internal.reflect.ReflectionHelper.makeAccessible(ReflectionHelper.java:35)
@@ -62,11 +65,10 @@ public class Geocoder {
 			Gson gson = new GsonBuilder().setPrettyPrinting().create();
 			LOG.info("Predictions: " + gson.toJson(predictions));
 		}
-		
 		 */
 
 		if (predictions == null || predictions.length == 0) {
-			throw new RuntimeException("No predictions found");
+			throw new RuntimeException("No predictions found for " + location);
 		}
 
 		// https://developers.google.com/maps/documentation/places/web-service/details
