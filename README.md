@@ -37,7 +37,7 @@ The way it works is that users scan a QR code presented by the person running th
 
 #### Pre-requisities
 
-1. Install Kafka; for example, the [Red Hat AMQ Streams operator](https://access.redhat.com/documentation/en-us/red_hat_amq_streams/2.4/html/getting_started_with_amq_streams_on_openshift/proc-deploying-cluster-operator-hub-str)
+1. Install Kafka; for example, the [Red Hat Streams for Apache Kafka operator](https://access.redhat.com/documentation/en-us/red_hat_streams_for_apache_kafka/2.7/html/getting_started_with_streams_for_apache_kafka_on_openshift/proc-deploying-cluster-operator-hub-str)
     1. Create project `amq-streams-kafka`
     1. OperatorHub } AMQ Streams } A specific namespace = `amq-streams-kafka`
     1. Kafka } Create Instance } my-cluster } Use all default options } Create
