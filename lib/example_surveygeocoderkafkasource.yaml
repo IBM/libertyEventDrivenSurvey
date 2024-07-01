@@ -4,7 +4,7 @@ metadata:
   name: locationtopicsource
 spec:
   bootstrapServers:
-  - my-cluster-kafka-bootstrap.amq-streams-kafka.svc:9092
+  - es1-kafka-bootstrap.cp4i.svc:9092
   sink:
     ref:
       apiVersion: serving.knative.dev/v1

@@ -4,3 +4,6 @@
 .vscode
 target/
 .DS_Store
+.gitignore
+lib/example_surveyadminservice.yaml
+lib/example_surveygeocoderservice.yaml

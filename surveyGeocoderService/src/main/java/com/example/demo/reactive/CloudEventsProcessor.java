@@ -1,14 +1,17 @@
 package com.example.demo.reactive;
 
+import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
-import org.eclipse.microprofile.reactive.messaging.Message;
 
 import com.example.demo.Geocoder;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.maps.errors.ApiException;
 import com.google.maps.model.PlaceDetails;
 
 import io.cloudevents.CloudEvent;
@@ -47,10 +50,30 @@ public class CloudEventsProcessor {
 		if (LOG.isLoggable(Level.INFO))
 			LOG.info("CloudEventData: " + data);
 
-		String location = null;
+		String jsonString = null;
 		try (StringDeserializer deserializer = new StringDeserializer()) {
-			location = deserializer.deserialize(null, data.toBytes());
+			jsonString = deserializer.deserialize(null, data.toBytes());
 		}
+
+		JsonObject jsonObj = (new Gson()).fromJson(jsonString, JsonObject.class);
+    String location = null;
+    String color = null;
+    String key = null;
+    if(jsonObj.has("location")) {
+      location = jsonObj.get("location").getAsString();
+    } else {
+      location = "unknown";
+    }
+    if(jsonObj.has("color")) {
+      color = jsonObj.get("color").getAsString();
+    } else {
+      color = "grey";
+    }
+    if(jsonObj.has("key")) {
+    	key = jsonObj.get("key").getAsString();
+    } else {
+    	key = "--";
+    }
 
 		if (LOG.isLoggable(Level.INFO))
 			LOG.info("Input location: " + location);
@@ -69,22 +92,24 @@ public class CloudEventsProcessor {
 			if (LOG.isLoggable(Level.INFO))
 				LOG.info("Geocoded point: " + latitude + "," + longitude);
 			
-			emitter.send(Message.of(latitude + " " + longitude + " " + location));
+			String jsonMessage = 
+				"{" +
+					"\"latitude\": "  + "\"" + latitude  + "\"," + 
+					"\"longitude\": " + "\"" + longitude + "\"," + 
+					"\"location\": "  + "\"" + location  + "\"," + 
+					"\"color\": "     + "\"" + color     + "\","  + 
+					"\"key\": "       + "\"" + key       + "\""  + 
+				"}";
+
+			emitter.send(jsonMessage);
 
 			result = Response.ok().build();
 
-		} catch (Throwable e) {
+		} catch (ApiException | InterruptedException | IOException e) {
 			if (LOG.isLoggable(Level.SEVERE))
 				LOG.log(Level.SEVERE, ERROR_FAILED_GEOCODING, e);
 
-			// Not much to do with an error as we don't have a way to notify
-			// the user, so we log it above and just return success.
-			// 
-			// TODO, we could emit an alternative message consumed by the admin
-			// application that shows some sort of message in the scrolling
-			// informational view.
-			result = Response.ok().build();			
-			//result = Response.serverError().entity(ERROR_FAILED_GEOCODING + ": " + e.getMessage()).build();
+			result = Response.serverError().entity(ERROR_FAILED_GEOCODING + ": " + e.getMessage()).build();
 		}
 
 		if (LOG.isLoggable(Level.FINER))

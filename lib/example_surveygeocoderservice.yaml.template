@@ -15,7 +15,7 @@ spec:
         imagePullPolicy: Always
         env:
         - name: mp.messaging.connector.liberty-kafka.bootstrap.servers
-          value: my-cluster-kafka-bootstrap.amq-streams-kafka.svc:9092
+          value: es1-kafka-bootstrap.cp4i.svc:9092
         - name: GOOGLE_API_KEY
           value: INSERT_API_KEY
         securityContext:
