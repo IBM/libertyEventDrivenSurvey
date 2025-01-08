@@ -12,6 +12,11 @@ The way it works is that users scan a QR code presented by the person running th
 
 ![Architecture diagram](lib/libertyEventDrivenSurvey-location.png)
 
+## Installing the application
+
+1. Perform the [Development](#development) steps.
+2. Perform the [Deploy to OpenShift >= 4.13](#deploy-to-openshift--413) steps.
+
 ## Development
 
 1. If using `podman machine`:
@@ -74,13 +79,9 @@ The way it works is that users scan a QR code presented by the person running th
         1. sink } enabled
         1. Click `Create`
         1. Wait for the `Ready` Condition in `Status`
-1. Clone repository:
+1. Change directory to this cloned repository:
    ```
-   git clone https://github.com/IBM/libertyEventDrivenSurvey
-   ```
-1. Change into the clone:
-   ```
-   cd libertyEventDrivenSurvey
+   cd .../libertyEventDrivenSurvey
    ```
 1. Check the current project is some test project name:
    ```
@@ -95,6 +96,8 @@ The way it works is that users scan a QR code presented by the person running th
    oc patch configs.imageregistry.operator.openshift.io/cluster --patch "{\"spec\":{\"defaultRoute\":true}}" --type=merge
    ```
 1. Get a [Google Maps API key](https://developers.google.com/maps/documentation/javascript/get-api-key) (simple usage should fit [within the free tier](https://mapsplatform.google.com/pricing/))
+    1. In general, it's recommended to use a restricted API key in case it is stolen. If you would like to do this, note that the same API key is used both by the JavaScript frontend in the browser and one of the services running in Kubernetes, so both would need to be allowed (e.g. by IP, etc.).
+    1. After creating the API key, go to [Enabled APIs & services](https://console.cloud.google.com/apis/dashboard), click `ENABLE APIS AND SERVICES`, and make sure that `Maps JavaScript API` and `Places API` are enabled.
 1. Create a service account for InstantOn:
    ```
    oc create serviceaccount instanton-sa
@@ -121,6 +124,10 @@ The way it works is that users scan a QR code presented by the person running th
              kubernetes.podspec-securitycontext: enabled
        ```
     1. Click `Save`
+
+##### Kafka Security
+
+If you want to enable Kafka Security (e.g. SASL), then you will need to follow the relevant steps in [Kafka connector security configuration](https://openliberty.io/docs/latest/liberty-kafka-connector-config-security.html) and change the relevant YAML configurations below. This may involve, for example, adding a keystore to some of the containers (either during the build phase or by mounting a directory).
 
 #### Deploy surveyInputService
 
@@ -179,7 +186,6 @@ The way it works is that users scan a QR code presented by the person running th
    ```
    oc exec -it $(oc get pod -o name | grep surveyadminservice) -c surveyadminservice -- cat /logs/messages.log
    ```
-1. Click `Start New Geolocation Survey`
 1. Create a KNative Eventing KafkaSource for `surveyAdminService` (if needed, replace `bootstrapServers` with the AMQ Streams Kafka Cluster bootstrap address):
    ```
    oc apply -f lib/example_surveyadminkafkasource.yaml
