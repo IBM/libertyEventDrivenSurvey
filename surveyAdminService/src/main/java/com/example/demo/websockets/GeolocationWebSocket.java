@@ -1,9 +1,16 @@
 package com.example.demo.websockets;
 
 import java.io.IOException;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.apache.kafka.clients.CommonClientConfigs;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.serialization.StringSerializer;
 
 import jakarta.websocket.EncodeException;
 import jakarta.websocket.OnClose;
@@ -51,7 +58,11 @@ public class GeolocationWebSocket {
 			
 			if (LOG.isLoggable(Level.INFO))
 				LOG.info("GeolocationWebSocket received message from " + session.getId() + ": " + message);
+
+			// Send message from websocket to Kafka topic
+			sendToKafka(message, "feedbacktopic");
 		}
+
 	}
 
 	@OnClose
@@ -105,5 +116,19 @@ public class GeolocationWebSocket {
 				handleException(session, t);
 			}
 		}
+	}
+
+	private void sendToKafka(String message, String topic) {
+		String bootstrapServer = System.getenv("mp.messaging.connector.liberty-kafka.bootstrap.servers");
+
+		Properties props = new Properties();
+		props.setProperty(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, bootstrapServer);
+		props.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+		props.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+		KafkaProducer<String, String> producer = new KafkaProducer<String, String>(props);
+		ProducerRecord<String, String> record = new ProducerRecord<String,String>(topic, message);
+		producer.send(record);
+		producer.flush();
+		producer.close();
 	}
 }

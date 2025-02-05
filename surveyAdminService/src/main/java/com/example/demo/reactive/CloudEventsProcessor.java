@@ -24,6 +24,8 @@ import org.apache.lucene.util.SloppyMath;
 
 import com.example.demo.Configuration;
 import com.example.demo.websockets.GeolocationWebSocket;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 import io.cloudevents.CloudEvent;
 import io.cloudevents.CloudEventData;
@@ -55,26 +57,27 @@ public class CloudEventsProcessor {
 		if (LOG.isLoggable(Level.INFO))
 			LOG.info("CloudEventData: " + data);
 
-		String geocodeResults = null;
+		String jsonString = null;
 		try (StringDeserializer deserializer = new StringDeserializer()) {
-			geocodeResults = deserializer.deserialize(null, data.toBytes());
+			jsonString = deserializer.deserialize(null, data.toBytes());
 		}
 
 		if (LOG.isLoggable(Level.INFO))
-			LOG.info("Geocode results: " + geocodeResults);
+			LOG.info("Geocode results: " + jsonString);
 
-		// latitude ' ' longitude ' ' location
-		String latitudeStr = geocodeResults.substring(0, geocodeResults.indexOf(' '));
-		geocodeResults = geocodeResults.substring(geocodeResults.indexOf(' ') + 1);
-		String longitudeStr = geocodeResults.substring(0, geocodeResults.indexOf(' '));
-		geocodeResults = geocodeResults.substring(geocodeResults.indexOf(' ') + 1);
+		JsonObject jsonObj = (new Gson()).fromJson(jsonString, JsonObject.class);
+		String latitudeStr = jsonObj.get("latitude").getAsString();
+		String longitudeStr = jsonObj.get("longitude").getAsString();
+		String location = jsonObj.get("location").getAsString();
+		String color = jsonObj.get("color").getAsString();
+		String key = jsonObj.get("key").getAsString();
 
 		double latitude = Double.parseDouble(latitudeStr);
 		double longitude = Double.parseDouble(longitudeStr);
 		double approximateDistance = SloppyMath.haversinMeters(latitude, longitude, Configuration.getSurveyLatitude(),
 				Configuration.getSuveyLongitude());
 
-		String finalResults = latitude + " " + longitude + " " + approximateDistance + " " + geocodeResults;
+		String finalResults = latitude + " " + longitude + " " + approximateDistance + " " + color + " " + key + " " + location;
 
 		try {
 			GeolocationWebSocket.sendMessageToAllBrowsers(finalResults);

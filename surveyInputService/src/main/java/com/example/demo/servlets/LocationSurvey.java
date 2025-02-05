@@ -39,8 +39,11 @@ public class LocationSurvey extends HttpServlet {
 
 		if (textInput1 != null && textInput1.length() > 0) {
 
+			String jsonMessage = "{\"location\": \""+ textInput1  +"\", \"color\": \"blue\"}";
+
 			// Input is good! Publish to Kafka
-			emitter.send(Message.of(textInput1));
+			emitter.send(Message.of(jsonMessage));
+
 
 			writeResponse(response, """
 					      <h1>Thank you!</h1>
