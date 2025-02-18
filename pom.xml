@@ -31,8 +31,8 @@ under the License.
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
     <!-- Liberty options -->
-      <openliberty.maven.version>3.10</openliberty.maven.version>
-      <openliberty.version>24.0.0.2</openliberty.version>
+      <openliberty.maven.version>3.11.2</openliberty.maven.version>
+      <openliberty.version>24.0.0.12</openliberty.version>
       <checkpoint.type>beforeAppStart</checkpoint.type>
 
     <!-- Liberty configuration

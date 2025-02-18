@@ -171,8 +171,8 @@ If you want to enable Kafka Security (e.g. SASL), then you will need to follow t
 1. Copy `lib/example_surveyadminservice.yaml.template` into `lib/example_surveyadminservice.yaml`, and then:
     1. Replace `INSERT_API_KEY` with your Google Maps API key
     1. Replace `INSERT_URL` with the URL from the `serviceInputService` above appended with `location.html`
-    1. Replace `mp.messaging.connector.liberty-kafka.bootstrap.servers` with the AMQ Streams Kafka Cluster bootstrap address
     1. If needed, replace `SURVEY_LATITUDE` and `SURVEY_LONGITUDE` (defaults to Las Vegas, NV, USA)
+    1. If needed, replace `mp.messaging.connector.liberty-kafka.bootstrap.servers` with the AMQ Streams Kafka Cluster bootstrap address
     1. Run:
        ```
        oc apply -f lib/example_surveyadminservice.yaml
@@ -210,7 +210,7 @@ If you want to enable Kafka Security (e.g. SASL), then you will need to follow t
    ```
 1. Copy `lib/example_surveygeocoderservice.yaml.template` into `lib/example_surveygeocoderservice.yaml`, and then:
     1. Replace `INSERT_API_KEY` with your Google Maps API key
-    1. Replace `mp.messaging.connector.liberty-kafka.bootstrap.servers` with the AMQ Streams Kafka Cluster bootstrap address
+    1. If needed, replace `mp.messaging.connector.liberty-kafka.bootstrap.servers` with the AMQ Streams Kafka Cluster bootstrap address
     1. Run:
        ```
        oc apply -f lib/example_surveygeocoderservice.yaml
