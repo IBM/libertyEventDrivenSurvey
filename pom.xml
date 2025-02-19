@@ -78,6 +78,7 @@ under the License.
   </properties>
 
   <modules>
+    <module>libertyEventDrivenUtil</module>
     <module>surveyAdminService</module>
     <module>surveyInputService</module>
     <module>surveyGeocoderService</module>

@@ -58,13 +58,13 @@ public class CloudEventsProcessor {
 		Response result = null;
 
 		try {
-			PlaceDetails geocodeResult = Geocoder.geocode(location);
+			Geocoder.GeocodeResults geocodeResult = Geocoder.geocode(location);
 
 			if (LOG.isLoggable(Level.INFO))
 				LOG.info("Geocode results: " + geocodeResult);
 
-			double latitude = geocodeResult.geometry.location.lat;
-			double longitude = geocodeResult.geometry.location.lng;
+			double latitude = geocodeResult.latitude;
+			double longitude = geocodeResult.longitude;
 
 			if (LOG.isLoggable(Level.INFO))
 				LOG.info("Geocoded point: " + latitude + "," + longitude);

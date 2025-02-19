@@ -1,6 +1,10 @@
 package com.example.demo;
 
 public class Configuration {
+	public static final String MAP_TYPE_OSM = "osm";
+	public static final String MAP_TYPE_GOOGLE = "google";
+	public static final String MAP_TYPE = System.getenv("MAP_TYPE") == null ? MAP_TYPE_OSM : System.getenv("MAP_TYPE");
+
 	private static final String GOOGLE_API_KEY = System.getenv("GOOGLE_API_KEY");
 	private static final String QRCODE_URL = System.getenv("QRCODE_URL");
 
@@ -15,6 +19,14 @@ public class Configuration {
 		return GOOGLE_API_KEY;
 	}
 
+	public static boolean isMapTypeOSM() {
+		return MAP_TYPE_OSM.equals(MAP_TYPE);
+	}
+	
+	public static boolean isMapTypeGoogle() {
+		return MAP_TYPE_GOOGLE.equals(MAP_TYPE);
+	}
+	
 	public static boolean isGoogleAPIKeyConfigured() {
 		return GOOGLE_API_KEY != null && GOOGLE_API_KEY.length() > 0 && !GOOGLE_API_KEY.equals("INSERT_API_KEY");
 	}

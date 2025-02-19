@@ -2,7 +2,7 @@
 
 `libertyEventDrivenSurvey` is an example event-driven survey application demonstrating [Liberty InstantOn](https://openliberty.io/docs/latest/instanton.html), CloudEvents, KNative, and MicroProfile Reactive Messaging 3.
 
-The way it works is that users scan a QR code presented by the person running the survey and users type in a location (e.g. New York). This is submitted to a microservice that can scale from zero using KNative Serving and quickly using Liberty InstantOn. This web service publishes the location to a Kafka topic. Another microservice that can scale from zero using KNative Eventing and the KNative Kafka Broker and quickly using Liberty InstantOn then receives this event and geocodes the location to a latitude and longitude through a Google Maps API. Finally, this pin works its way back through another Kafka topic and WebSockets back to the map that the person running the survey is showing.
+The way it works is that users scan a QR code presented by the person running the survey and users type in a location (e.g. New York). This is submitted to a microservice that can scale from zero using KNative Serving and quickly using Liberty InstantOn. This web service publishes the location to a Kafka topic. Another microservice that can scale from zero using KNative Eventing and the KNative Kafka Broker and quickly using Liberty InstantOn then receives this event and geocodes the location to a latitude and longitude through a Geoapify or Google Maps API. Finally, this pin works its way back through another Kafka topic and WebSockets back to the map that the person running the survey is showing.
 
 ## Screeenshots and Architecture for Geocoding
 
@@ -95,9 +95,15 @@ The way it works is that users scan a QR code presented by the person running th
    ```
    oc patch configs.imageregistry.operator.openshift.io/cluster --patch "{\"spec\":{\"defaultRoute\":true}}" --type=merge
    ```
-1. Get a [Google Maps API key](https://developers.google.com/maps/documentation/javascript/get-api-key) (simple usage should fit [within the free tier](https://mapsplatform.google.com/pricing/))
-    1. In general, it's recommended to use a restricted API key in case it is stolen. If you would like to do this, note that the same API key is used both by the JavaScript frontend in the browser and one of the services running in Kubernetes, so both would need to be allowed (e.g. by IP, etc.).
-    1. After creating the API key, go to [Enabled APIs & services](https://console.cloud.google.com/apis/dashboard), click `ENABLE APIS AND SERVICES`, and make sure that `Maps JavaScript API` and `Places API` are enabled.
+1. Choose your geocoding provider:
+    1. Get a [Geoapify key](https://www.geoapify.com/pricing/) (default)
+        1. [Free commercial usage](https://www.geoapify.com/):
+           > When you stay within the Free pricing plan quota, you can use the Maps API for free, even for a commercial app.
+        1. [Attribution policy](https://www.geoapify.com/terms-and-conditions/)
+           > Geoapify attribution is mandatory when using Free subscription plan.
+    1. Get a [Google Maps API key](https://developers.google.com/maps/documentation/javascript/get-api-key) (simple usage should fit [within the free tier](https://mapsplatform.google.com/pricing/))
+        1. In general, it's recommended to use a restricted API key in case it is stolen. If you would like to do this, note that the same API key is used both by the JavaScript frontend in the browser and one of the services running in Kubernetes, so both would need to be allowed (e.g. by IP, etc.).
+        1. After creating the API key, go to [Enabled APIs & services](https://console.cloud.google.com/apis/dashboard), click `ENABLE APIS AND SERVICES`, and make sure that `Maps JavaScript API` and `Places API` are enabled.
 1. Create a service account for InstantOn:
    ```
    oc create serviceaccount instanton-sa
@@ -169,7 +175,7 @@ If you want to enable Kafka Security (e.g. SASL), then you will need to follow t
    podman push --tls-verify=false $REGISTRY/libertysurvey/surveyadminservice
    ```
 1. Copy `lib/example_surveyadminservice.yaml.template` into `lib/example_surveyadminservice.yaml`, and then:
-    1. Replace `INSERT_API_KEY` with your Google Maps API key
+    1. If using Google as the map provider, add a `GOOGLE_API_KEY` `env` entry with your Google Maps API key
     1. Replace `INSERT_URL` with the URL from the `serviceInputService` above appended with `location.html`
     1. If needed, replace `SURVEY_LATITUDE` and `SURVEY_LONGITUDE` (defaults to Las Vegas, NV, USA)
     1. If needed, replace `mp.messaging.connector.liberty-kafka.bootstrap.servers` with the AMQ Streams Kafka Cluster bootstrap address
@@ -209,7 +215,8 @@ If you want to enable Kafka Security (e.g. SASL), then you will need to follow t
    podman push --tls-verify=false $REGISTRY/libertysurvey/surveygeocoderservice
    ```
 1. Copy `lib/example_surveygeocoderservice.yaml.template` into `lib/example_surveygeocoderservice.yaml`, and then:
-    1. Replace `INSERT_API_KEY` with your Google Maps API key
+    1. If using Geoapify as the geocoding provider (default), add a `GEOAPIFY_API_KEY` `env` entry with your Geoapify API key
+    1. If using Google as the geocoding provider, add a `GOOGLE_API_KEY` `env` entry with your Google Maps API key
     1. If needed, replace `mp.messaging.connector.liberty-kafka.bootstrap.servers` with the AMQ Streams Kafka Cluster bootstrap address
     1. Run:
        ```
@@ -232,6 +239,18 @@ If you want to enable Kafka Security (e.g. SASL), then you will need to follow t
    kn source kafka describe locationtopicsource
    ```
 1. Note that `scale-down-delay` does not apply to the initial pod creation so the pod will be terminated about 30 seconds after it's initially created. Once a real user request is made to this application, then `scale-down-delay` will apply. Therefore, if you want to tail the logs of the pod, first wait for the initial pod to terminate and then make a request to the application and then you can tail the pod logs.
+
+#### Update KNative Service to new image
+
+Run `kn service update` with the service name and the same image name from the YAML; for examples:
+
+```
+kn service update surveyinputservice --image=image-registry.openshift-image-registry.svc:5000/libertysurvey/surveyinputservice
+
+kn service update surveygeocoderservice --image=image-registry.openshift-image-registry.svc:5000/libertysurvey/surveygeocoderservice
+
+kn service update surveyadminservice --image=image-registry.openshift-image-registry.svc:5000/libertysurvey/surveyadminservice
+```
 
 #### Test
 
@@ -313,7 +332,7 @@ Only some functions can be tested locally without KNative.
 
 1. Run `surveyAdminService`:
    ```
-   podman run --privileged --rm -e GOOGLE_API_KEY=YOUR_KEY -p 8080:8080 -p 8443:8443 -it localhost/surveyadminservice:latest
+   podman run --privileged --rm -e GEOAPIFY_API_KEY=YOUR_KEY -p 8080:8080 -p 8443:8443 -it localhost/surveyadminservice:latest
    ```
 1. Open browser to <http://localhost:8080/geolocation.jsp>
 1. Post a [`CloudEvent`](https://github.com/cloudevents/spec/blob/v1.0/spec.md#required-attributes):
@@ -360,7 +379,7 @@ Only some functions can be tested locally without KNative.
    ```
 1. Run `surveyGeocoderService`:
    ```
-   podman run --privileged --rm -p 8080:8080 -p 8443:8443 -e "GOOGLE_API_KEY=INSERT_API_KEY" -it localhost/surveygeocoderservice:latest
+   podman run --privileged --rm -p 8080:8080 -p 8443:8443 -e "GEOAPIFY_API_KEY=INSERT_API_KEY" -it localhost/surveygeocoderservice:latest
    ```
 1. Post a [`CloudEvent`](https://github.com/cloudevents/spec/blob/v1.0/spec.md#required-attributes):
    ```
@@ -376,7 +395,7 @@ Only some functions can be tested locally without KNative.
 #### Testing without containers
 
 1. Change directory to the application
-1. `GOOGLE_API_KEY=INSERT_API_KEY mvn clean liberty:dev`
+1. `GEOAPIFY_API_KEY=INSERT_API_KEY mvn clean liberty:dev`
 1. Open <http://localhost:8080/>
 
 ## Learn More
