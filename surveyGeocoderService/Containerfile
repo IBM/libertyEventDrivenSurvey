@@ -12,7 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-FROM icr.io/appcafe/websphere-liberty:full-java17-openj9-ubi
+FROM icr.io/appcafe/websphere-liberty:24.0.0.12-full-java17-openj9-ubi
 
 # These defaults are overridden by `--build-arg` arguments in pom.xml
 ARG NAME=placeholder
