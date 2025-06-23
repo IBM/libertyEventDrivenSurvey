@@ -11,7 +11,7 @@ spec:
       serviceAccountName: instanton-sa
       containers:
       - name: surveygeocoderservice
-        image: image-registry.openshift-image-registry.svc:5000/libertysurvey/surveygeocoderservice
+        image: quay.io/ibm/libertyeventdrivensurvey:surveygeocoderservice
         imagePullPolicy: Always
         env:
         - name: mp.messaging.connector.liberty-kafka.bootstrap.servers

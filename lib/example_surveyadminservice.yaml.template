@@ -12,7 +12,7 @@ spec:
       serviceAccountName: instanton-sa
       containers:
       - name: surveyadminservice
-        image: image-registry.openshift-image-registry.svc:5000/libertysurvey/surveyadminservice
+        image: quay.io/ibm/libertyeventdrivensurvey:surveyadminservice
         imagePullPolicy: Always
         env:
         - name: mp.messaging.connector.liberty-kafka.bootstrap.servers
