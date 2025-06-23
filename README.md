@@ -100,6 +100,12 @@ If you want to enable Kafka Security (e.g. SASL), then you will need to follow t
 
 ### Deploy surveyInputService
 
+1. Copy `lib/example_surveyinputservice.yaml.template` into `lib/example_surveyinputservice.yaml`, and then:
+    1. If using a local build, replace `image` with `image-registry.openshift-image-registry.svc:5000/libertysurvey/surveyinputservice`
+    1. Run:
+       ```
+       oc apply -f lib/example_surveyinputservice.yaml
+       ```
 1. Create a KNative Service for `surveyInputService` (if needed, replace `mp.messaging.connector.liberty-kafka.bootstrap.servers` with the AMQ Streams Kafka Cluster bootstrap address, and if using a local build, replace `image` with `image-registry.openshift-image-registry.svc:5000/libertysurvey/surveyinputservice`):
    ```
    oc apply -f lib/example_surveyinputservice.yaml
