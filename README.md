@@ -64,7 +64,7 @@ The way it works is that users scan a QR code presented by the person running th
            > When you stay within the Free pricing plan quota, you can use the Maps API for free, even for a commercial app.
         1. [Attribution policy](https://www.geoapify.com/terms-and-conditions/)
            > Geoapify attribution is mandatory when using Free subscription plan.
-    1. Get a [Google Maps API key](https://developers.google.com/maps/documentation/javascript/get-api-key) (simple usage should fit [within the free tier](https://mapsplatform.google.com/pricing/))
+    1. Or get a [Google Maps API key](https://developers.google.com/maps/documentation/javascript/get-api-key) (simple usage should fit [within the free tier](https://mapsplatform.google.com/pricing/))
         1. In general, it's recommended to use a restricted API key in case it is stolen. If you would like to do this, note that the same API key is used both by the JavaScript frontend in the browser and one of the services running in Kubernetes, so both would need to be allowed (e.g. by IP, etc.).
         1. After creating the API key, go to [Enabled APIs & services](https://console.cloud.google.com/apis/dashboard), click `ENABLE APIS AND SERVICES`, and make sure that `Maps JavaScript API` and `Places API` are enabled.
 1. Create a service account for InstantOn:
