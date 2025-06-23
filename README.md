@@ -397,6 +397,37 @@ Only some functions can be tested locally without KNative.
 1. `GEOAPIFY_API_KEY=INSERT_API_KEY mvn clean liberty:dev`
 1. Open <http://localhost:8080/>
 
+## Steps to publish new images to Quay
+
+1. Set a variable to this version in your shell; for example:
+   ```
+   VERSION="240012"
+   ```
+1. List local images:
+   ```
+   podman images
+   REPOSITORY                        TAG       IMAGE ID      CREATED         SIZE
+   localhost/surveygeocoderservice   latest    4fb2fc7d5a7c  19 seconds ago  1.52 GB
+   localhost/surveyinputservice      latest    92ee9560daa7  3 minutes ago   1.49 GB
+   localhost/surveyadminservice      latest    449a71e98b45  5 minutes ago   1.52 GB
+   ```
+1. Tag the images for Quay:
+   ```
+   podman tag localhost/surveygeocoderservice quay.io/ibm/libertyeventdrivensurvey:surveygeocoderservice${VERSION}
+   podman tag localhost/surveyinputservice quay.io/ibm/libertyeventdrivensurvey:surveyinputservice${VERSION}
+   podman tag localhost/surveyadminservice quay.io/ibm/libertyeventdrivensurvey:surveyadminservice${VERSION}
+   ```
+1. Log into Quay:
+   ```
+   podman login quay.io
+   ```
+1. Push with the version in step 1:
+   ```
+   podman push quay.io/ibm/libertyeventdrivensurvey:surveygeocoderservice${VERSION}
+   podman push quay.io/ibm/libertyeventdrivensurvey:surveyinputservice${VERSION}
+   podman push quay.io/ibm/libertyeventdrivensurvey:surveyadminservice${VERSION}
+   ```
+
 ## Learn More
 
 1. <https://developer.ibm.com/articles/develop-reactive-microservices-with-microprofile/>
