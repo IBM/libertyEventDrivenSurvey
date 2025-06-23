@@ -54,17 +54,9 @@ The way it works is that users scan a QR code presented by the person running th
         1. Click `Create`
         1. Wait for the `Ready` Condition in `Status`
 1. Change directory to this cloned repository:
-1. Check the current project is some test project name:
+1. Create and switch to some test project:
    ```
-   oc project
-   ```
-    1. If not, create and switch to some test project:
-       ```
-       oc new-project libertysurvey
-       ```
-1. Ensure the [internal OpenShift registry is available](https://docs.openshift.com/container-platform/latest/registry/securing-exposing-registry.html):
-   ```
-   oc patch configs.imageregistry.operator.openshift.io/cluster --patch "{\"spec\":{\"defaultRoute\":true}}" --type=merge
+   oc new-project libertysurvey
    ```
 1. Choose your geocoding provider:
     1. Get a [Geoapify key](https://www.geoapify.com/pricing/) (default)
