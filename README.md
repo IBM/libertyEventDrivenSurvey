@@ -24,7 +24,7 @@ The way it works is that users scan a QR code presented by the person running th
         1. If you get a warning about "inter.broker.protocol.version", apply the [known workaround](https://access.redhat.com/solutions/7020156)
     1. Kafka Topic } Create KafkaTopic } `locationtopic` } Create
     1. Kafka Topic } Create KafkaTopic } `geocodetopic` } Create
-1. Install KNative; for example, the [Red Hat OpenShift Serverless operator](https://docs.openshift.com/serverless/1.29/install/install-serverless-operator.html)
+1. Install KNative; for example, the [Red Hat `OpenShift Serverless` operator](https://docs.openshift.com/serverless/1.29/install/install-serverless-operator.html)
     1. Install the [`kn` command line utility](https://docs.openshift.com/serverless/1.29/install/installing-kn.html)
         1. Alternatively, install the latest version of [kn](https://knative.dev/docs/client/install-kn/#verifying-cli-binaries) and the [kafka plugin](https://knative.dev/docs/client/kn-plugins/#list-of-knative-plugins)
             1. macOS:
@@ -53,7 +53,7 @@ The way it works is that users scan a QR code presented by the person running th
         1. sink } enabled
         1. Click `Create`
         1. Wait for the `Ready` Condition in `Status`
-1. Change directory to this cloned repository:
+1. Change directory to this cloned repository
 1. Create and switch to some test project:
    ```
    oc new-project libertysurvey
