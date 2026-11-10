@@ -45,7 +45,7 @@ under the License.
     <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
-      <version>20250107</version>
+      <version>20260719</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.microprofile</groupId>
